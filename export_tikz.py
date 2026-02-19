@@ -400,12 +400,13 @@ def build_snippet(source_path: Path, *, use_pdflatex: bool = False) -> str:
     body_lines: list[str] = []
 
     for i, line in enumerate(lines, start=1):
-        lineno_tex = f"\\textcolor{{vscLineno}}{{{i}}}"
+        # Line number rendered at \tiny so it matches the code font size
+        lineno_tex = f"{{\\tiny\\ttfamily\\textcolor{{vscLineno}}{{{i}}}}}"
         if not line.strip():
-            # Blank source line — emit an empty strut so vertical spacing is preserved
+            # Blank source line — emit a compact strut (no extra paragraph gap)
             body_lines.append(
                 f"  \\noindent\\makebox[2.0em][r]{{{lineno_tex}}}\\hspace{{4pt}}"
-                f"\\strut\\par"
+                f"{{\\tiny\\ttfamily\\strut}}\\par"
             )
         else:
             rendered, n_physical = _render_line_wrapped(line, i, spans)
@@ -417,7 +418,7 @@ def build_snippet(source_path: Path, *, use_pdflatex: bool = False) -> str:
             )
             # Continuation lines (wrapped) carry a dim ~ placeholder
             for cont in physical[1:]:
-                cont_no = "\\textcolor{vscLineno}{~}"
+                cont_no = "{\\tiny\\ttfamily\\textcolor{vscLineno}{~}}"
                 body_lines.append(
                     f"  \\noindent\\makebox[2.0em][r]{{{cont_no}}}\\hspace{{4pt}}"
                     f"{{\\tiny\\ttfamily {cont}}}\\par"
@@ -450,6 +451,10 @@ def build_snippet(source_path: Path, *, use_pdflatex: bool = False) -> str:
     left=4pt, right=4pt, top=8pt, bottom=8pt,
   ]
 
+    % Tight line spacing — zero paragraph skip, compact baseline
+    \\parskip=0pt\\relax
+    \\baselineskip=1.35ex\\relax
+
     % macOS chrome bar: traffic lights + filename
     {{\\tiny\\ttfamily%
     \\tikz[baseline=-0.6ex]{{%
@@ -458,9 +463,9 @@ def build_snippet(source_path: Path, *, use_pdflatex: bool = False) -> str:
       \\fill[vscBtnGreen]  (24pt,0)  circle (4pt);
     }}\\hspace{{10pt}}%
     \\textcolor{{vscDefault}}{{{filename}}}}}\\par
-    \\vspace{{4pt}}%
+    \\vspace{{3pt}}%
     {{\\color{{vscLineno}}\\hrule height 0.3pt}}%
-    \\vspace{{4pt}}%
+    \\vspace{{2pt}}%
 
     % Code lines — each is an independent paragraph so tcolorbox can break here
 {code_body}
