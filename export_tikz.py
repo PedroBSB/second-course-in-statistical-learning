@@ -31,23 +31,26 @@ from pathlib import Path
 # VSCode Dark token colors (extracted from live CodeImage CSS via Playwright)
 # ---------------------------------------------------------------------------
 COLORS: dict[str, str] = {
-    "background":  "#1E1E1E",  # editor background   (ͼoy)
-    "frame_outer": "#151516",  # outer window frame
-    "default":     "#9AD6FE",  # default text         (ͼou)
-    "keyword":     "#529DDA",  # def, return, import… (ͼp6)
-    "function":    "#DCDCA8",  # function names        (ͼpg)
-    "number":      "#B4CDA7",  # numeric literals      (ͼpb)
-    "string":      "#CE9178",  # string literals
-    "comment":     "#8DA1B9",  # # comments            (ͼ4m)
-    "operator":    "#FAFAFA",  # operators/punctuation (ͼpi)
-    "bracket":     "#DBD700",  # () {} []              (ͼpj / ͼpk)
-    "type":        "#4EC9B0",  # class / type names
-    "decorator":   "#DCDCA8",  # decorators
+    # Background colors — verified from live CodeImage DOM (Playwright)
+    "background":  "#1D1D1D",  # editor background   (_1ipb3lb0, rgb(29,29,29))
+    "frame_outer": "#151516",  # outer window frame  (_5i4ydv4, rgb(21,21,22))
+    # Syntax token colors — verified from .cm-line span computed styles
+    "default":     "#9AD6FE",  # default text / unspanned (cm-line, rgb(154,214,254))
+    "keyword":     "#529DDA",  # def, return, import… (ͼp6, rgb(82,157,218))
+    "function":    "#DCDCA8",  # function names        (ͼpg, rgb(220,220,168))
+    "number":      "#B4CDA7",  # numeric literals      (ͼpb, rgb(180,205,167))
+    "string":      "#CE9178",  # string literals       (ͼp4/ͼou, rgb(206,145,120))
+    "comment":     "#8DA1B9",  # # comments            (ͼ4m, rgb(141,161,185))
+    "operator":    "#FAFAFA",  # operators/punctuation (ͼpi, rgb(250,250,250))
+    "bracket":     "#DBD700",  # () {} []              (ͼpj/ͼpk, rgb(219,215,0))
+    "type":        "#4EC9B0",  # class / type names    (ͼou)
+    "decorator":   "#DCDCA8",  # decorators            (ͼpg)
     "lineno":      "#7C8083",  # line numbers          (ͼow)
     "selection":   "#264F78",  # selection background  (ͼox)
-    "btn_red":     "#FF5F57",  # macOS close button
-    "btn_yellow":  "#FEBC2E",  # macOS minimise button
-    "btn_green":   "#28C840",  # macOS maximise button
+    # macOS window chrome buttons
+    "btn_red":     "#FF5F57",  # close  (_1qit5qm1)
+    "btn_yellow":  "#FEBC2E",  # minimise (_1qit5qm2)
+    "btn_green":   "#28C840",  # maximise (_1qit5qm3)
 }
 
 # ---------------------------------------------------------------------------
