@@ -160,7 +160,12 @@ def _colourise_line(
 # LaTeX helpers
 # ---------------------------------------------------------------------------
 def _latex_escape(text: str) -> str:
-    """Escape all LaTeX-special characters for use inside \\textcolor{}{}."""
+    """Escape all LaTeX-special characters for use inside \\textcolor{}{}.
+
+    Spaces are replaced with \\ (backslash-space) so that multiple
+    consecutive spaces (indentation) are preserved in \\ttfamily context
+    and are not collapsed by TeX's inter-word space rules.
+    """
     text = text.replace("\\", r"\textbackslash{}")
     text = text.replace("{",  r"\{")
     text = text.replace("}",  r"\}")
@@ -174,6 +179,9 @@ def _latex_escape(text: str) -> str:
     text = text.replace("<",  r"\textless{}")
     text = text.replace(">",  r"\textgreater{}")
     text = text.replace("|",  r"\textbar{}")
+    # Replace every space with an explicit inter-word space so that
+    # consecutive spaces (Python indentation) are not collapsed by TeX.
+    text = text.replace(" ",  r"\ ")
     return text
 
 
@@ -258,14 +266,7 @@ def _preamble_comment(use_pdflatex: bool) -> str:
 %%     colframe=vscFrameOuter,
 %%     colback=vscBackground,
 %%     colupper=vscDefault,
-%%     fontupper=\\tiny\\ttfamily,
-%%     toptitle=6pt, bottomtitle=6pt,
-%%     attach boxed title to top left={{xshift=10pt}},
-%%     boxed title style={{
-%%       colback=vscFrameOuter, colframe=vscFrameOuter,
-%%       boxrule=0pt, arc=0pt, outer arc=0pt,
-%%     }},
-%%     left=4pt, right=4pt, top=6pt, bottom=6pt,
+%%     left=4pt, right=4pt, top=8pt, bottom=8pt,
 %%   }},
 %% }}
 %% ============================================================"""
@@ -376,10 +377,11 @@ def _render_line_wrapped(
 def build_snippet(source_path: Path, *, use_pdflatex: bool = False) -> str:
     """Return a LaTeX snippet (tcolorbox block only, no preamble/document).
 
-    Uses alltt for the code body so that:
-    - spaces are preserved verbatim (indentation works)
-    - line breaks are natural (no \\ needed, no "no line to end" errors)
-    - \\textcolor{}{} commands still work inside alltt
+    Each source line is rendered as an inline paragraph:
+        \\noindent\\makebox[2em][r]{lineno}\\hspace{4pt}{code}\\par
+    so the breakable tcolorbox can split between any two lines.
+    No minipage, no alltt — spaces are preserved via explicit \\ (backslash-space)
+    inserted by _latex_escape for every space character.
     Long lines are wrapped at _WRAP_WIDTH visible chars with a continuation marker.
     """
     source = source_path.read_text(encoding="utf-8")
@@ -388,59 +390,57 @@ def build_snippet(source_path: Path, *, use_pdflatex: bool = False) -> str:
     raw_spans = tokenize_python(source)
     spans     = _annotate_function_names(lines, raw_spans)
 
-    # Render each source line, wrapping long ones.
-    # Track how many physical lines each source line produces
-    # so we can emit the correct number of line-number entries.
-    rendered_code_parts: list[str] = []
-    lineno_entries: list[str] = []
+    # Build one LaTeX paragraph per physical line.
+    # Each paragraph: \noindent\makebox[2em][r]{lineno}\hspace{4pt}{code}\par
+    body_lines: list[str] = []
 
     for i, line in enumerate(lines, start=1):
+        lineno_tex = f"\\textcolor{{vscLineno}}{{{i}}}"
         if not line.strip():
-            rendered_code_parts.append("\\mbox{}")
-            lineno_entries.append(f"    \\textcolor{{vscLineno}}{{{i}}} \\\\")
+            # Blank source line — emit an empty strut so vertical spacing is preserved
+            body_lines.append(
+                f"  \\noindent\\makebox[2.0em][r]{{{lineno_tex}}}\\hspace{{4pt}}"
+                f"\\strut\\par"
+            )
         else:
             rendered, n_physical = _render_line_wrapped(line, i, spans)
-            rendered_code_parts.append(rendered)
-            # First physical line gets the line number; continuations are blank
-            lineno_entries.append(f"    \\textcolor{{vscLineno}}{{{i}}} \\\\")
-            for _ in range(n_physical - 1):
-                lineno_entries.append("    \\textcolor{vscLineno}{~} \\\\")
+            physical = rendered.split("\n")
+            # First physical line carries the real line number
+            body_lines.append(
+                f"  \\noindent\\makebox[2.0em][r]{{{lineno_tex}}}\\hspace{{4pt}}"
+                f"{{\\tiny\\ttfamily {physical[0]}}}\\par"
+            )
+            # Continuation lines (wrapped) carry a dim ~ placeholder
+            for cont in physical[1:]:
+                cont_no = "\\textcolor{vscLineno}{~}"
+                body_lines.append(
+                    f"  \\noindent\\makebox[2.0em][r]{{{cont_no}}}\\hspace{{4pt}}"
+                    f"{{\\tiny\\ttfamily {cont}}}\\par"
+                )
 
-    code_alltt = "\n".join(rendered_code_parts)
-    lineno_lines = "\n".join(lineno_entries)
-
+    code_body = "\n".join(body_lines)
     filename = _latex_escape(source_path.name)
     preamble_hint = _preamble_comment(use_pdflatex)
 
     return f"""{preamble_hint}
 %% Auto-generated by export_tikz.py — source: {source_path.name}
 %%
-\\begin{{tcolorbox}}[
-  codewindow,
-  title={{%
-    % macOS traffic-light buttons
-    \\tikz[baseline=-0.6ex]{{%
-      \\fill[vscBtnRed]    (0,0)     circle (4pt);
-      \\fill[vscBtnYellow] (12pt,0)  circle (4pt);
-      \\fill[vscBtnGreen]  (24pt,0)  circle (4pt);
-    }}\\hspace{{10pt}}%
-    {{\\ttfamily\\tiny\\textcolor{{vscDefault}}{{{filename}}}}}%
-  }},
-]
+\\begin{{tcolorbox}}[codewindow]
 
-  % Layout: line numbers (right-aligned) | code (alltt, preserves spaces)
-  \\noindent
-  \\begin{{minipage}}[t]{{2.0em}}%
-    {{\\tiny\\ttfamily\\color{{vscLineno}}%
-     \\raggedleft\\setlength{{\\baselineskip}}{{1.45em}}%
-{lineno_lines}
-    }}%
-  \\end{{minipage}}%
-  \\hspace{{4pt}}%
-  \\begin{{minipage}}[t]{{\\dimexpr\\linewidth-2.0em-4pt\\relax}}%
-    {{\\tiny\\ttfamily\\color{{vscDefault}}%
-    \\begin{{alltt}}{code_alltt}\\end{{alltt}}}}%
-  \\end{{minipage}}
+  % macOS chrome bar: traffic lights + filename
+  {{\\tiny\\ttfamily%
+  \\tikz[baseline=-0.6ex]{{%
+    \\fill[vscBtnRed]    (0,0)     circle (4pt);
+    \\fill[vscBtnYellow] (12pt,0)  circle (4pt);
+    \\fill[vscBtnGreen]  (24pt,0)  circle (4pt);
+  }}\\hspace{{10pt}}%
+  \\textcolor{{vscDefault}}{{{filename}}}}}\\par
+  \\vspace{{4pt}}%
+  {{\\color{{vscLineno}}\\hrule height 0.3pt}}%
+  \\vspace{{4pt}}%
+
+  % Code lines — each is an independent paragraph so tcolorbox can break here
+{code_body}
 
 \\end{{tcolorbox}}
 """
