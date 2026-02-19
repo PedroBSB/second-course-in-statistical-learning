@@ -260,6 +260,8 @@ def _preamble_comment(use_pdflatex: bool) -> str:
 %%     enhanced, breakable,
 %%     arc=6pt, outer arc=6pt, boxrule=0pt,
 %%     colback=vscBackground, colframe=vscBackground,
+%%     colupper=vscDefault,
+%%     fontupper=\\tiny\\ttfamily,
 %%     left=4pt, right=4pt, top=8pt, bottom=8pt,
 %%   }},
 %% }}
@@ -324,13 +326,15 @@ def build_snippet(source_path: Path, *, use_pdflatex: bool = False) -> str:
   \\begin{{tcolorbox}}[codepanel]
 
     % Filename bar
-    {{\\ttfamily\\scriptsize\\textcolor{{vscDefault}}{{{filename}}}}}\\par
+    {{\\ttfamily\\tiny\\textcolor{{vscDefault}}{{{filename}}}}}\\par
     \\vspace{{2pt}}\\hrule height 0.3pt\\vspace{{4pt}}
 
     % Layout: line numbers (right-aligned) | code (alltt, preserves spaces)
+    % Default color set via \\color{{vscDefault}} inside alltt.
+    % Each syntax token overrides independently.
     \\noindent
     \\begin{{minipage}}[t]{{2.0em}}%
-      {{\\scriptsize\\ttfamily\\color{{vscLineno}}%
+      {{\\tiny\\ttfamily\\color{{vscLineno}}%
        \\raggedleft\\setlength{{\\baselineskip}}{{1.45em}}%
 {lineno_lines}
       }}%
@@ -338,9 +342,8 @@ def build_snippet(source_path: Path, *, use_pdflatex: bool = False) -> str:
     \\hspace{{4pt}}%
     \\begin{{minipage}}[t]{{\\dimexpr\\linewidth-2.0em-4pt\\relax}}%
       \\begin{{alltt}}%
-\\textcolor{{vscDefault}}{{\\scriptsize\\ttfamily%
+\\tiny\\ttfamily\\color{{vscDefault}}%
 {code_alltt}%
-}}%
       \\end{{alltt}}%
     \\end{{minipage}}
 
