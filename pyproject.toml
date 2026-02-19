@@ -17,6 +17,7 @@ scipy = "^1.15"
 statsmodels = "^0.14"
 jupyterlab = "^4.3"
 ipykernel = "^6.29"
+playwright = "^1.50"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3"

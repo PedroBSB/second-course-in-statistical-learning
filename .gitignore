@@ -28,3 +28,10 @@ build/
 # Environment variables
 .env
 .env.*
+
+# Generated images (keep the folder, ignore generated files)
+images/*.svg
+images/*.png
+images/*.jpg
+images/*.jpeg
+!images/.gitkeep
