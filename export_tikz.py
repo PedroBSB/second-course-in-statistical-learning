@@ -1,57 +1,58 @@
 """
-export_tikz.py — Convert Python source files to LaTeX (tcolorbox) code images.
+export_tikz.py — Convert Python source files to LaTeX (tcolorbox) snippets.
 
-Mimics the visual style of CodeImage with VSCode Dark theme:
-- Dark background #1E1E1E
-- JetBrains Mono font
-- macOS-style window chrome (traffic-light buttons)
-- VSCode Dark syntax colors for Python tokens
+Outputs ONLY the \\begin{tcolorbox}...\\end{tcolorbox} block so you can
+paste it directly into any chapter of your Overleaf document.
+
+The generated file starts with a comment block listing every package and
+color definition you must add to your preamble once.
 
 Usage:
-    python export_tikz.py source/linear_regression.py   # single file
-    python export_tikz.py                                # all .py in source/
+    python export_tikz.py source/linear_regression.py        # XeLaTeX/LuaLaTeX (default)
+    python export_tikz.py source/linear_regression.py --pdflatex  # pdfLaTeX fallback font
+    python export_tikz.py                                     # all .py in source/
 
-Output: images/<stem>.tex  (compile with XeLaTeX or LuaLaTeX)
+Output: images/<stem>.tex
+
+Overleaf engine:
+    XeLaTeX / LuaLaTeX  -> Menu > Compiler > XeLaTeX  (supports JetBrains Mono)
+    pdfLaTeX            -> use --pdflatex flag          (uses Inconsolata instead)
 """
 
 from __future__ import annotations
 
+import io
 import sys
-import re
+import token as _token
+import tokenize
 from pathlib import Path
 
 # ---------------------------------------------------------------------------
 # VSCode Dark token colors (extracted from live CodeImage CSS via Playwright)
 # ---------------------------------------------------------------------------
-COLORS = {
-    "background":   "#1E1E1E",   # editor background  (ͼoy)
-    "frame_outer":  "#151516",   # outer window frame
-    "default":      "#9AD6FE",   # default text        (ͼou)
-    "keyword":      "#529DDA",   # def, return, import… (ͼp6)
-    "function":     "#DCDCA8",   # function names       (ͼpg)
-    "number":       "#B4CDA7",   # numeric literals     (ͼpb)
-    "string":       "#CE9178",   # string literals
-    "comment":      "#8DA1B9",   # # comments           (ͼ4m)
-    "operator":     "#FAFAFA",   # operators / punctuation (ͼpi)
-    "bracket":      "#DBD700",   # () {} []             (ͼpj / ͼpk)
-    "type":         "#4EC9B0",   # class / type names
-    "decorator":    "#DCDCA8",   # decorators
-    "lineno":       "#7C8083",   # line numbers         (ͼow)
-    "selection":    "#264F78",   # selection background (ͼox)
-    # macOS traffic-light buttons
-    "btn_red":      "#FF5F57",
-    "btn_yellow":   "#FEBC2E",
-    "btn_green":    "#28C840",
+COLORS: dict[str, str] = {
+    "background":  "#1E1E1E",  # editor background   (ͼoy)
+    "frame_outer": "#151516",  # outer window frame
+    "default":     "#9AD6FE",  # default text         (ͼou)
+    "keyword":     "#529DDA",  # def, return, import… (ͼp6)
+    "function":    "#DCDCA8",  # function names        (ͼpg)
+    "number":      "#B4CDA7",  # numeric literals      (ͼpb)
+    "string":      "#CE9178",  # string literals
+    "comment":     "#8DA1B9",  # # comments            (ͼ4m)
+    "operator":    "#FAFAFA",  # operators/punctuation (ͼpi)
+    "bracket":     "#DBD700",  # () {} []              (ͼpj / ͼpk)
+    "type":        "#4EC9B0",  # class / type names
+    "decorator":   "#DCDCA8",  # decorators
+    "lineno":      "#7C8083",  # line numbers          (ͼow)
+    "selection":   "#264F78",  # selection background  (ͼox)
+    "btn_red":     "#FF5F57",  # macOS close button
+    "btn_yellow":  "#FEBC2E",  # macOS minimise button
+    "btn_green":   "#28C840",  # macOS maximise button
 }
 
 # ---------------------------------------------------------------------------
-# Minimal Python tokeniser using the standard `tokenize` module
+# Python token classifier
 # ---------------------------------------------------------------------------
-import tokenize
-import io
-import token as _token
-
-# Keywords we want to colour like VSCode Dark
 PYTHON_KEYWORDS = frozenset({
     "False", "None", "True", "and", "as", "assert", "async", "await",
     "break", "class", "continue", "def", "del", "elif", "else", "except",
@@ -60,7 +61,6 @@ PYTHON_KEYWORDS = frozenset({
     "while", "with", "yield",
 })
 
-# Built-in type / exception names coloured like types
 BUILTIN_TYPES = frozenset({
     "int", "float", "str", "bool", "list", "dict", "set", "tuple",
     "bytes", "bytearray", "complex", "type", "object",
@@ -69,14 +69,11 @@ BUILTIN_TYPES = frozenset({
     "IOError", "FileNotFoundError", "NotImplementedError",
 })
 
-TokenKind = str  # colour key from COLORS
+TokenKind = str  # key into COLORS
+
 
 def tokenize_python(source: str) -> list[tuple[int, int, int, int, TokenKind]]:
-    """
-    Tokenise *source* and return a list of
-    (start_row, start_col, end_row, end_col, colour_key).
-    Rows are 1-based; columns 0-based (same as tokenize module).
-    """
+    """Return (start_row, start_col, end_row, end_col, colour_key) for every token."""
     results: list[tuple[int, int, int, int, TokenKind]] = []
     try:
         tokens = list(tokenize.generate_tokens(io.StringIO(source).readline))
@@ -103,15 +100,7 @@ def tokenize_python(source: str) -> list[tuple[int, int, int, int, TokenKind]]:
             else:
                 kind = "default"
         elif ttype == _token.OP:
-            if tstr in "()[]{}":
-                kind = "bracket"
-            elif tstr in ("=", "==", "!=", "<", ">", "<=", ">=",
-                          "+", "-", "*", "/", "//", "%", "**",
-                          "&", "|", "^", "~", "<<", ">>",
-                          "->", ":", ",", "."):
-                kind = "operator"
-            else:
-                kind = "operator"
+            kind = "bracket" if tstr in "()[]{}" else "operator"
         elif ttype in (_token.NEWLINE, _token.NL, _token.INDENT,
                        _token.DEDENT, _token.ENDMARKER):
             continue
@@ -123,12 +112,11 @@ def tokenize_python(source: str) -> list[tuple[int, int, int, int, TokenKind]]:
     return results
 
 
-# Post-process: detect function names (NAME token immediately after 'def' or 'class')
 def _annotate_function_names(
     source_lines: list[str],
     spans: list[tuple[int, int, int, int, TokenKind]],
 ) -> list[tuple[int, int, int, int, TokenKind]]:
-    """Upgrade the token *after* `def` / `class` to colour 'function'."""
+    """Upgrade the NAME token immediately after 'def'/'class' to 'function'."""
     out = []
     prev_kind = ""
     prev_str  = ""
@@ -144,21 +132,21 @@ def _annotate_function_names(
 
 
 # ---------------------------------------------------------------------------
-# Colour a single source line into a list of (text, colour_key) segments
+# Line colouring
 # ---------------------------------------------------------------------------
-def colourise_line(
+def _colourise_line(
     line_text: str,
-    line_no: int,                            # 1-based
+    line_no: int,
     spans: list[tuple[int, int, int, int, TokenKind]],
 ) -> list[tuple[str, TokenKind]]:
-    """Return list of (text_fragment, colour_key) for one source line."""
-    relevant = [s for s in spans if s[0] == line_no and s[2] == line_no]
-    # Sort by start column
-    relevant.sort(key=lambda s: s[1])
-
+    """Split one source line into (text_fragment, colour_key) segments."""
+    relevant = sorted(
+        (s for s in spans if s[0] == line_no and s[2] == line_no),
+        key=lambda s: s[1],
+    )
     segments: list[tuple[str, TokenKind]] = []
     cursor = 0
-    for srow, scol, erow, ecol, kind in relevant:
+    for _, scol, _, ecol, kind in relevant:
         if scol > cursor:
             segments.append((line_text[cursor:scol], "default"))
         segments.append((line_text[scol:ecol], kind))
@@ -172,13 +160,7 @@ def colourise_line(
 # LaTeX helpers
 # ---------------------------------------------------------------------------
 def _latex_escape(text: str) -> str:
-    """Escape characters that are special in LaTeX listings/verbatim context.
-
-    We use lstlisting with mathescape=false and escapeinside=||, so the only
-    characters we need to handle specially are the ones used for our escape
-    sequences and standard LaTeX specials.
-    """
-    # Replace backslash first to avoid double-escaping
+    """Escape all LaTeX-special characters for use inside \\textcolor{}{}."""
     text = text.replace("\\", r"\textbackslash{}")
     text = text.replace("{",  r"\{")
     text = text.replace("}",  r"\}")
@@ -195,324 +177,192 @@ def _latex_escape(text: str) -> str:
     return text
 
 
-def _color_cmd(key: str) -> str:
-    """Return a LaTeX color name for the given token key."""
-    return f"vsc{key.capitalize()}"
+def _color_name(key: str) -> str:
+    """Map a COLORS key to a LaTeX color name, e.g. 'keyword' -> 'vscKeyword'."""
+    # Handle keys with underscores: frame_outer -> vscFrameOuter
+    parts = key.split("_")
+    camel = "".join(p.capitalize() for p in parts)
+    return f"vsc{camel}"
 
 
-def _define_colors(colors: dict[str, str]) -> str:
-    """Return \\definecolor commands for all COLORS entries."""
+def _define_colors_block(colors: dict[str, str]) -> str:
+    """Return one \\definecolor line per entry in *colors*."""
     lines = []
     for key, hexval in colors.items():
-        name = _color_cmd(key)
         r = int(hexval[1:3], 16)
         g = int(hexval[3:5], 16)
         b = int(hexval[5:7], 16)
-        lines.append(
-            f"\\definecolor{{{name}}}{{RGB}}{{{r},{g},{b}}}"
-        )
+        lines.append(f"\\definecolor{{{_color_name(key)}}}{{RGB}}{{{r},{g},{b}}}")
     return "\n".join(lines)
 
 
-def render_line_latex(
+def _render_line(
     line_text: str,
     line_no: int,
     spans: list[tuple[int, int, int, int, TokenKind]],
 ) -> str:
-    """Render one source line as a LaTeX fragment with inline colour commands."""
-    segments = colourise_line(line_text.rstrip("\n"), line_no, spans)
+    """Render one source line as a sequence of \\textcolor{}{} commands."""
+    segments = _colourise_line(line_text.rstrip("\n"), line_no, spans)
     parts = []
     for text, kind in segments:
         if not text:
             continue
-        escaped = _latex_escape(text)
-        color   = _color_cmd(kind)
-        parts.append(f"\\textcolor{{{color}}}{{{escaped}}}")
+        parts.append(f"\\textcolor{{{_color_name(kind)}}}{{{_latex_escape(text)}}}")
     return "".join(parts)
 
 
 # ---------------------------------------------------------------------------
-# Build the full .tex document
+# Preamble comment block (engine-aware)
 # ---------------------------------------------------------------------------
-def build_tex(source_path: Path) -> str:
+def _preamble_comment(use_pdflatex: bool) -> str:
+    color_block = _define_colors_block(COLORS)
+    if use_pdflatex:
+        font_block = (
+            "% pdfLaTeX font (JetBrains Mono is not available; using Inconsolata)\n"
+            "\\usepackage[scaled=0.85]{inconsolata}"
+        )
+        engine_note = "pdfLaTeX"
+    else:
+        font_block = (
+            "% XeLaTeX / LuaLaTeX only — set compiler in Overleaf: Menu > Compiler > XeLaTeX\n"
+            "\\usepackage{fontspec}\n"
+            "\\setmonofont[Scale=0.85]{JetBrains Mono}"
+        )
+        engine_note = "XeLaTeX or LuaLaTeX"
+
+    return f"""%% ============================================================
+%% PASTE THE FOLLOWING INTO YOUR PREAMBLE (once per document)
+%% Engine required: {engine_note}
+%% ============================================================
+%%
+%% % ---- Font -------------------------------------------------
+%% {font_block.replace(chr(10), chr(10) + "%% ")}
+%%
+%% % ---- Colors -----------------------------------------------
+%% \\usepackage{{xcolor}}
+%% {color_block.replace(chr(10), chr(10) + "%% ")}
+%%
+%% % ---- TikZ / tcolorbox ------------------------------------
+%% \\usepackage{{tikz}}
+%% \\usepackage[most]{{tcolorbox}}
+%% \\usetikzlibrary{{calc, positioning}}
+%%
+%% % ---- tcolorbox styles (paste once, anywhere before use) --
+%% \\tcbset{{
+%%   codewindow/.style={{
+%%     enhanced, arc=12pt, outer arc=12pt, boxrule=0pt,
+%%     colback=vscFrameOuter, colframe=vscFrameOuter,
+%%     left=28pt, right=28pt, top=12pt, bottom=24pt,
+%%   }},
+%%   codepanel/.style={{
+%%     enhanced, arc=8pt, outer arc=8pt, boxrule=0pt,
+%%     colback=vscBackground, colframe=vscBackground,
+%%     left=8pt, right=8pt, top=10pt, bottom=10pt,
+%%     fontupper=\\ttfamily\\footnotesize,
+%%   }},
+%% }}
+%% ============================================================"""
+
+
+# ---------------------------------------------------------------------------
+# Main snippet builder
+# ---------------------------------------------------------------------------
+def build_snippet(source_path: Path, *, use_pdflatex: bool = False) -> str:
+    """Return a LaTeX snippet (tcolorbox block only, no preamble/document)."""
     source = source_path.read_text(encoding="utf-8")
     lines  = source.splitlines()
+    n_lines = len(lines)
 
-    # Tokenise
     raw_spans = tokenize_python(source)
     spans     = _annotate_function_names(lines, raw_spans)
 
-    # Rendered code lines
-    code_lines = []
-    for i, line in enumerate(lines, start=1):
-        rendered = render_line_latex(line, i, spans)
-        code_lines.append(rendered)
-
-    code_body = "\\\\\n".join(code_lines)
-    n_lines   = len(lines)
-
-    # Line-number column content
-    lineno_col = "\\\\\n".join(
-        f"\\textcolor{{{_color_cmd('lineno')}}}{{{i}}}"
+    # Line-numbers minipage content
+    lineno_block = "\n".join(
+        f"\\textcolor{{{_color_name('lineno')}}}{{{i}}}\\\\"
         for i in range(1, n_lines + 1)
     )
 
-    color_defs = _define_colors(COLORS)
-
-    filename = source_path.name
-
-    doc = rf"""% Auto-generated by export_tikz.py
-% Source: {filename}
-% Compile with: xelatex or lualatex
-%
-\documentclass{{standalone}}
-
-% ---- Font & encoding -------------------------------------------------------
-\usepackage{{fontspec}}
-\setmonofont[
-  Scale       = 0.85,
-  Ligatures   = TeX,
-]{{"JetBrains Mono"}}
-
-% ---- Color -----------------------------------------------------------------
-\usepackage{{xcolor}}
-{color_defs}
-
-% ---- TikZ / tcolorbox ------------------------------------------------------
-\usepackage{{tikz}}
-\usepackage[most]{{tcolorbox}}
-\usetikzlibrary{{calc}}
-
-% ---- Misc ------------------------------------------------------------------
-\usepackage{{setspace}}
-
-% ============================================================================
-\begin{{document}}
-
-% Outer frame (matches CodeImage outer background)
-\begin{{tcolorbox}}[
-  enhanced,
-  arc          = 12pt,
-  outer arc    = 12pt,
-  boxrule      = 0pt,
-  colback      = vscFrame_outer,
-  colframe     = vscFrame_outer,
-  left         = 28pt,
-  right        = 28pt,
-  top          = 22pt,
-  bottom       = 22pt,
-]
-
-  % ---- Window chrome (macOS traffic-light buttons) -------------------------
-  \begin{{tikzpicture}}[remember picture, overlay]
-    \node[circle, fill=vscBtn_red,    minimum size=12pt, inner sep=0pt]
-      at ($(current bounding box.north west)+(20pt,-16pt)$) {{}};
-    \node[circle, fill=vscBtn_yellow, minimum size=12pt, inner sep=0pt]
-      at ($(current bounding box.north west)+(36pt,-16pt)$) {{}};
-    \node[circle, fill=vscBtn_green,  minimum size=12pt, inner sep=0pt]
-      at ($(current bounding box.north west)+(52pt,-16pt)$) {{}};
-  \end{{tikzpicture}}
-  \vspace{{16pt}}
-
-  % ---- Code window ---------------------------------------------------------
-  \begin{{tcolorbox}}[
-    enhanced,
-    arc          = 8pt,
-    outer arc    = 8pt,
-    boxrule      = 0pt,
-    colback      = vscBackground,
-    colframe     = vscBackground,
-    left         = 6pt,
-    right        = 6pt,
-    top          = 14pt,
-    bottom       = 14pt,
-    fontupper    = \ttfamily\small,
-  ]
-    % ---- Filename tab at top -----------------------------------------------
-    \noindent
-    \colorbox{{vscBackground!80!black}}{{%
-      \textcolor{{vscDefault}}{{\ttfamily\scriptsize {filename}}}%
-    }}
-    \vspace{{6pt}}
-
-    % ---- Line numbers + code side-by-side ----------------------------------
-    \noindent
-    \begin{{tabular}}{{@{{}}r@{{\hspace{{10pt}}}}l@{{}}}}
-{lineno_col.replace(chr(10), chr(10) + "      ")} &
-{code_body.replace(chr(10), chr(10) + "      ")} \\
-    \end{{tabular}}
-  \end{{tcolorbox}}
-
-\end{{tcolorbox}}
-
-\end{{document}}
-"""
-    return doc
-
-
-# ---------------------------------------------------------------------------
-# Helpers: table approach doesn't work well with multi-line code rendering.
-# Use a minipage / alltt approach instead.
-# ---------------------------------------------------------------------------
-def build_tex_v2(source_path: Path) -> str:
-    """
-    Better layout: line numbers and code side-by-side using two minipages
-    inside a tcolorbox.
-    """
-    source = source_path.read_text(encoding="utf-8")
-    lines  = source.splitlines()
-
-    # Tokenise
-    raw_spans = tokenize_python(source)
-    spans     = _annotate_function_names(lines, raw_spans)
-    n_lines   = len(lines)
-
-    # Rendered code lines
-    code_rendered = []
-    for i, line in enumerate(lines, start=1):
-        rendered = render_line_latex(line, i, spans)
-        # Preserve leading spaces (convert to \phantom or \hspace)
-        leading = len(line) - len(line.lstrip())
-        if leading > 0:
-            space_str = r"\hspace{" + f"{leading * 0.52}em" + "}"
-            # The leading spaces are already part of rendered; we keep them
-        code_rendered.append(rendered)
-
-    color_defs = _define_colors(COLORS)
-    filename   = source_path.name
-
-    # Build lineno block (one per line, right-aligned)
-    lineno_lines = "\n".join(
-        r"\textcolor{" + _color_cmd("lineno") + "}{" + str(i) + r"}\\"
-        for i in range(1, n_lines + 1)
+    # Code minipage content
+    code_block = "\n".join(
+        _render_line(line, i, spans) + r"\\"
+        for i, line in enumerate(lines, start=1)
     )
 
-    # Build code block (one rendered line per \\ )
-    code_lines_block = "\n".join(
-        rendered + r"\\"
-        for rendered in code_rendered
-    )
+    filename = _latex_escape(source_path.name)
+    preamble_hint = _preamble_comment(use_pdflatex)
 
-    doc = rf"""% Auto-generated by export_tikz.py
-% Source: {filename}
-% Compile with: xelatex or lualatex
-%
-\documentclass{{standalone}}
-
-% ---- Font & encoding -------------------------------------------------------
-\usepackage{{fontspec}}
-\setmonofont[
-  Scale = 0.85,
-]{{"JetBrains Mono"}}
-
-% ---- Color -----------------------------------------------------------------
-\usepackage{{xcolor}}
-{color_defs}
-
-% ---- TikZ / tcolorbox ------------------------------------------------------
-\usepackage{{tikz}}
-\usepackage[most]{{tcolorbox}}
-\usetikzlibrary{{calc, positioning}}
-
-% ---- Misc ------------------------------------------------------------------
-\usepackage{{microtype}}
-\usepackage{{ragged2e}}
-
-% ============================================================================
-\begin{{document}}
-
-\tcbset{{
-  codewindow/.style={{
-    enhanced,
-    arc=12pt, outer arc=12pt,
-    boxrule=0pt,
-    colback=vscFrame_outer,
-    colframe=vscFrame_outer,
-    left=28pt, right=28pt,
-    top=12pt, bottom=24pt,
-  }},
-  codepanel/.style={{
-    enhanced,
-    arc=8pt, outer arc=8pt,
-    boxrule=0pt,
-    colback=vscBackground,
-    colframe=vscBackground,
-    left=8pt, right=8pt,
-    top=10pt, bottom=10pt,
-    fontupper=\ttfamily\footnotesize,
-  }},
-}}
-
-\begin{{tcolorbox}}[codewindow]
+    return f"""{preamble_hint}
+%% Auto-generated by export_tikz.py — source: {source_path.name}
+%%
+\\begin{{tcolorbox}}[codewindow]
 
   % macOS traffic-light buttons
-  \noindent\hspace{{4pt}}%
-  \tikz{{
-    \fill[vscBtn_red]    (0,0) circle (5pt);
-    \fill[vscBtn_yellow] (14pt,0) circle (5pt);
-    \fill[vscBtn_green]  (28pt,0) circle (5pt);
+  \\noindent\\hspace{{4pt}}%
+  \\tikz{{
+    \\fill[vscBtnRed]    (0,0) circle (5pt);
+    \\fill[vscBtnYellow] (14pt,0) circle (5pt);
+    \\fill[vscBtnGreen]  (28pt,0) circle (5pt);
   }}
-  \vspace{{10pt}}
+  \\vspace{{10pt}}
 
-  \begin{{tcolorbox}}[codepanel]
+  \\begin{{tcolorbox}}[codepanel]
 
-    % Filename tab
-    \noindent{{\ttfamily\scriptsize\textcolor{{vscDefault}}{{{filename}}}}}
-    \vspace{{4pt}}\hrule height 0.4pt \vspace{{6pt}}
+    % Filename
+    \\noindent{{\\ttfamily\\scriptsize\\textcolor{{vscDefault}}{{{filename}}}}}
+    \\vspace{{4pt}}\\hrule height 0.4pt\\vspace{{6pt}}
 
-    % Line numbers (right-aligned) | Code
-    \noindent
-    \begin{{minipage}}[t]{{1.6em}}
-      \setlength{{\baselineskip}}{{1.45em}}
-      \raggedleft
-{lineno_lines}
-    \end{{minipage}}%
-    \hspace{{8pt}}%
-    \begin{{minipage}}[t]{{\dimexpr\linewidth-1.6em-8pt\relax}}
-      \setlength{{\baselineskip}}{{1.45em}}
-      \raggedright
-{code_lines_block}
-    \end{{minipage}}
+    % Line numbers | Code
+    \\noindent
+    \\begin{{minipage}}[t]{{1.8em}}
+      \\setlength{{\\baselineskip}}{{1.45em}}
+      \\raggedleft
+{lineno_block}
+    \\end{{minipage}}%
+    \\hspace{{8pt}}%
+    \\begin{{minipage}}[t]{{\\dimexpr\\linewidth-1.8em-8pt\\relax}}
+      \\setlength{{\\baselineskip}}{{1.45em}}
+      \\raggedright
+{code_block}
+    \\end{{minipage}}
 
-  \end{{tcolorbox}}
+  \\end{{tcolorbox}}
 
-\end{{tcolorbox}}
-
-\end{{document}}
+\\end{{tcolorbox}}
 """
-    return doc
 
 
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
-def export_file(source_file: Path) -> Path:
+def export_file(source_file: Path, *, use_pdflatex: bool = False) -> Path:
     out_dir = Path("images")
     out_dir.mkdir(exist_ok=True)
     out_path = out_dir / (source_file.stem + ".tex")
-    tex = build_tex_v2(source_file)
-    out_path.write_text(tex, encoding="utf-8")
+    snippet = build_snippet(source_file, use_pdflatex=use_pdflatex)
+    out_path.write_text(snippet, encoding="utf-8")
     print(f"  Written: {out_path}")
     return out_path
 
 
 def main() -> None:
-    args = sys.argv[1:]
-    if args:
-        files = [Path(a) for a in args]
-    else:
-        files = sorted(Path("source").glob("*.py"))
+    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    use_pdflatex = "--pdflatex" in sys.argv
+
+    files = [Path(a) for a in args] if args else sorted(Path("source").glob("*.py"))
 
     if not files:
         print("No .py files found in source/")
         sys.exit(1)
+
+    engine = "pdfLaTeX" if use_pdflatex else "XeLaTeX/LuaLaTeX"
+    print(f"Engine: {engine}")
 
     for f in files:
         if not f.exists():
             print(f"  File not found: {f}")
             continue
         print(f"Processing: {f}")
-        export_file(f)
+        export_file(f, use_pdflatex=use_pdflatex)
 
     print("Done.")
 
