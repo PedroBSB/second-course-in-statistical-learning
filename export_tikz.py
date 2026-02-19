@@ -162,9 +162,11 @@ def _colourise_line(
 def _latex_escape(text: str) -> str:
     """Escape all LaTeX-special characters for use inside \\textcolor{}{}.
 
-    Spaces are replaced with \\ (backslash-space) so that multiple
-    consecutive spaces (indentation) are preserved in \\ttfamily context
-    and are not collapsed by TeX's inter-word space rules.
+    Spaces are replaced with \\hspace{.6em} so that multiple consecutive
+    spaces (Python indentation) are preserved with correct monospace width
+    and cannot be mis-scanned by XeLaTeX as part of a color name argument.
+    Single/double quotes are replaced with \\textquotesingle{} / \\textquotedbl{}
+    to prevent fontspec ligature substitution in \\ttfamily mode.
     """
     text = text.replace("\\", r"\textbackslash{}")
     text = text.replace("{",  r"\{")
@@ -179,9 +181,14 @@ def _latex_escape(text: str) -> str:
     text = text.replace("<",  r"\textless{}")
     text = text.replace(">",  r"\textgreater{}")
     text = text.replace("|",  r"\textbar{}")
-    # Replace every space with an explicit inter-word space so that
-    # consecutive spaces (Python indentation) are not collapsed by TeX.
-    text = text.replace(" ",  r"\ ")
+    text = text.replace("'",  r"\textquotesingle{}")
+    text = text.replace('"',  r"\textquotedbl{}")
+    # Replace every space with a kern equal to one em-unit of the current
+    # font. \hspace{.6em} approximates the monospace character width at
+    # \tiny JetBrains Mono Scale=0.85. Using \hspace avoids the XeLaTeX
+    # argument-scanner ambiguity that '\ ' (control space) can cause when
+    # it appears just before a \textcolor{} color-name argument.
+    text = text.replace(" ",  r"\hspace{.6em}")
     return text
 
 
