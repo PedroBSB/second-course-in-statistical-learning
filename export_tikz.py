@@ -218,13 +218,13 @@ def _preamble_comment(use_pdflatex: bool) -> str:
     color_block = _define_colors_block(COLORS)
     if use_pdflatex:
         font_block = (
-            "% pdfLaTeX font (JetBrains Mono is not available; using Inconsolata)\n"
+            "% pdfLaTeX font (JetBrains Mono not available; using Inconsolata)\n"
             "\\usepackage[scaled=0.85]{inconsolata}"
         )
         engine_note = "pdfLaTeX"
     else:
         font_block = (
-            "% XeLaTeX / LuaLaTeX only — set compiler in Overleaf: Menu > Compiler > XeLaTeX\n"
+            "% XeLaTeX / LuaLaTeX — Overleaf: Menu > Compiler > XeLaTeX\n"
             "\\usepackage{fontspec}\n"
             "\\setmonofont[Scale=0.85]{JetBrains Mono}"
         )
@@ -242,23 +242,25 @@ def _preamble_comment(use_pdflatex: bool) -> str:
 %% \\usepackage{{xcolor}}
 %% {color_block.replace(chr(10), chr(10) + "%% ")}
 %%
-%% % ---- TikZ / tcolorbox ------------------------------------
+%% % ---- Packages ---------------------------------------------
+%% \\usepackage{{alltt}}
 %% \\usepackage{{tikz}}
 %% \\usepackage[most]{{tcolorbox}}
+%% \\tcbuselibrary{{breakable}}
 %% \\usetikzlibrary{{calc, positioning}}
 %%
-%% % ---- tcolorbox styles (paste once, anywhere before use) --
+%% % ---- tcolorbox styles (paste once, before first use) ------
 %% \\tcbset{{
 %%   codewindow/.style={{
-%%     enhanced, arc=12pt, outer arc=12pt, boxrule=0pt,
+%%     enhanced, arc=10pt, outer arc=10pt, boxrule=0pt,
 %%     colback=vscFrameOuter, colframe=vscFrameOuter,
-%%     left=28pt, right=28pt, top=12pt, bottom=24pt,
+%%     left=20pt, right=20pt, top=10pt, bottom=18pt,
 %%   }},
 %%   codepanel/.style={{
-%%     enhanced, arc=8pt, outer arc=8pt, boxrule=0pt,
+%%     enhanced, breakable,
+%%     arc=6pt, outer arc=6pt, boxrule=0pt,
 %%     colback=vscBackground, colframe=vscBackground,
-%%     left=8pt, right=8pt, top=10pt, bottom=10pt,
-%%     fontupper=\\ttfamily\\footnotesize,
+%%     left=4pt, right=4pt, top=8pt, bottom=8pt,
 %%   }},
 %% }}
 %% ============================================================"""
@@ -268,7 +270,13 @@ def _preamble_comment(use_pdflatex: bool) -> str:
 # Main snippet builder
 # ---------------------------------------------------------------------------
 def build_snippet(source_path: Path, *, use_pdflatex: bool = False) -> str:
-    """Return a LaTeX snippet (tcolorbox block only, no preamble/document)."""
+    """Return a LaTeX snippet (tcolorbox block only, no preamble/document).
+
+    Uses alltt for the code body so that:
+    - spaces are preserved verbatim (indentation works)
+    - line breaks are natural (no \\ needed, no "no line to end" errors)
+    - \textcolor{}{} commands still work inside alltt
+    """
     source = source_path.read_text(encoding="utf-8")
     lines  = source.splitlines()
     n_lines = len(lines)
@@ -276,16 +284,25 @@ def build_snippet(source_path: Path, *, use_pdflatex: bool = False) -> str:
     raw_spans = tokenize_python(source)
     spans     = _annotate_function_names(lines, raw_spans)
 
-    # Line-numbers minipage content
-    lineno_block = "\n".join(
-        f"\\textcolor{{{_color_name('lineno')}}}{{{i}}}\\\\"
-        for i in range(1, n_lines + 1)
+    # Inside alltt, only \, {, } are special.  Spaces and newlines are literal.
+    # We already escape those three in _latex_escape, so _render_line is safe.
+    # We just need to NOT use \\ for line breaks — alltt uses real newlines.
+    code_lines = [
+        _render_line(line, i, spans)
+        for i, line in enumerate(lines, start=1)
+    ]
+    # alltt treats a blank line as a paragraph break (adds extra vertical space).
+    # Replace empty rendered lines with a \mbox{} to suppress that.
+    code_alltt = "\n".join(
+        (line if line.strip() else "\\mbox{}")
+        for line in code_lines
     )
 
-    # Code minipage content
-    code_block = "\n".join(
-        _render_line(line, i, spans) + r"\\"
-        for i, line in enumerate(lines, start=1)
+    # Line-number column: one number per line, right-aligned, same font size.
+    # Use a simple tabular with a fixed-width column.
+    lineno_lines = "\n".join(
+        f"    \\textcolor{{vscLineno}}{{{i}}} \\\\"
+        for i in range(1, n_lines + 1)
     )
 
     filename = _latex_escape(source_path.name)
@@ -298,31 +315,33 @@ def build_snippet(source_path: Path, *, use_pdflatex: bool = False) -> str:
 
   % macOS traffic-light buttons
   \\noindent\\hspace{{4pt}}%
-  \\tikz{{
-    \\fill[vscBtnRed]    (0,0) circle (5pt);
-    \\fill[vscBtnYellow] (14pt,0) circle (5pt);
-    \\fill[vscBtnGreen]  (28pt,0) circle (5pt);
-  }}
-  \\vspace{{10pt}}
+  \\tikz[baseline=-0.6ex]{{%
+    \\fill[vscBtnRed]    (0,0)     circle (4pt);
+    \\fill[vscBtnYellow] (12pt,0)  circle (4pt);
+    \\fill[vscBtnGreen]  (24pt,0)  circle (4pt);
+  }}\\par\\vspace{{6pt}}
 
   \\begin{{tcolorbox}}[codepanel]
 
-    % Filename
-    \\noindent{{\\ttfamily\\scriptsize\\textcolor{{vscDefault}}{{{filename}}}}}
-    \\vspace{{4pt}}\\hrule height 0.4pt\\vspace{{6pt}}
+    % Filename bar
+    {{\\ttfamily\\scriptsize\\textcolor{{vscDefault}}{{{filename}}}}}\\par
+    \\vspace{{2pt}}\\hrule height 0.3pt\\vspace{{4pt}}
 
-    % Line numbers | Code
+    % Layout: line numbers (right-aligned) | code (alltt, preserves spaces)
     \\noindent
-    \\begin{{minipage}}[t]{{1.8em}}
-      \\setlength{{\\baselineskip}}{{1.45em}}
-      \\raggedleft
-{lineno_block}
+    \\begin{{minipage}}[t]{{2.0em}}%
+      {{\\scriptsize\\ttfamily\\color{{vscLineno}}%
+       \\raggedleft\\setlength{{\\baselineskip}}{{1.45em}}%
+{lineno_lines}
+      }}%
     \\end{{minipage}}%
-    \\hspace{{8pt}}%
-    \\begin{{minipage}}[t]{{\\dimexpr\\linewidth-1.8em-8pt\\relax}}
-      \\setlength{{\\baselineskip}}{{1.45em}}
-      \\raggedright
-{code_block}
+    \\hspace{{4pt}}%
+    \\begin{{minipage}}[t]{{\\dimexpr\\linewidth-2.0em-4pt\\relax}}%
+      \\begin{{alltt}}%
+\\textcolor{{vscDefault}}{{\\scriptsize\\ttfamily%
+{code_alltt}%
+}}%
+      \\end{{alltt}}%
     \\end{{minipage}}
 
   \\end{{tcolorbox}}

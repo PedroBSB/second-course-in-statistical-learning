@@ -4,7 +4,7 @@
 %% ============================================================
 %%
 %% % ---- Font -------------------------------------------------
-%% % XeLaTeX / LuaLaTeX only — set compiler in Overleaf: Menu > Compiler > XeLaTeX
+%% % XeLaTeX / LuaLaTeX — Overleaf: Menu > Compiler > XeLaTeX
 %% \usepackage{fontspec}
 %% \setmonofont[Scale=0.85]{JetBrains Mono}
 %%
@@ -28,23 +28,25 @@
 %% \definecolor{vscBtnYellow}{RGB}{254,188,46}
 %% \definecolor{vscBtnGreen}{RGB}{40,200,64}
 %%
-%% % ---- TikZ / tcolorbox ------------------------------------
+%% % ---- Packages ---------------------------------------------
+%% \usepackage{alltt}
 %% \usepackage{tikz}
 %% \usepackage[most]{tcolorbox}
+%% \tcbuselibrary{breakable}
 %% \usetikzlibrary{calc, positioning}
 %%
-%% % ---- tcolorbox styles (paste once, anywhere before use) --
+%% % ---- tcolorbox styles (paste once, before first use) ------
 %% \tcbset{
 %%   codewindow/.style={
-%%     enhanced, arc=12pt, outer arc=12pt, boxrule=0pt,
+%%     enhanced, arc=10pt, outer arc=10pt, boxrule=0pt,
 %%     colback=vscFrameOuter, colframe=vscFrameOuter,
-%%     left=28pt, right=28pt, top=12pt, bottom=24pt,
+%%     left=20pt, right=20pt, top=10pt, bottom=18pt,
 %%   },
 %%   codepanel/.style={
-%%     enhanced, arc=8pt, outer arc=8pt, boxrule=0pt,
+%%     enhanced, breakable,
+%%     arc=6pt, outer arc=6pt, boxrule=0pt,
 %%     colback=vscBackground, colframe=vscBackground,
-%%     left=8pt, right=8pt, top=10pt, bottom=10pt,
-%%     fontupper=\ttfamily\footnotesize,
+%%     left=4pt, right=4pt, top=8pt, bottom=8pt,
 %%   },
 %% }
 %% ============================================================
@@ -54,183 +56,185 @@
 
   % macOS traffic-light buttons
   \noindent\hspace{4pt}%
-  \tikz{
-    \fill[vscBtnRed]    (0,0) circle (5pt);
-    \fill[vscBtnYellow] (14pt,0) circle (5pt);
-    \fill[vscBtnGreen]  (28pt,0) circle (5pt);
-  }
-  \vspace{10pt}
+  \tikz[baseline=-0.6ex]{%
+    \fill[vscBtnRed]    (0,0)     circle (4pt);
+    \fill[vscBtnYellow] (12pt,0)  circle (4pt);
+    \fill[vscBtnGreen]  (24pt,0)  circle (4pt);
+  }\par\vspace{6pt}
 
   \begin{tcolorbox}[codepanel]
 
-    % Filename
-    \noindent{\ttfamily\scriptsize\textcolor{vscDefault}{linear\_regression.py}}
-    \vspace{4pt}\hrule height 0.4pt\vspace{6pt}
+    % Filename bar
+    {\ttfamily\scriptsize\textcolor{vscDefault}{linear\_regression.py}}\par
+    \vspace{2pt}\hrule height 0.3pt\vspace{4pt}
 
-    % Line numbers | Code
+    % Layout: line numbers (right-aligned) | code (alltt, preserves spaces)
     \noindent
-    \begin{minipage}[t]{1.8em}
-      \setlength{\baselineskip}{1.45em}
-      \raggedleft
-\textcolor{vscLineno}{1}\\
-\textcolor{vscLineno}{2}\\
-\textcolor{vscLineno}{3}\\
-\textcolor{vscLineno}{4}\\
-\textcolor{vscLineno}{5}\\
-\textcolor{vscLineno}{6}\\
-\textcolor{vscLineno}{7}\\
-\textcolor{vscLineno}{8}\\
-\textcolor{vscLineno}{9}\\
-\textcolor{vscLineno}{10}\\
-\textcolor{vscLineno}{11}\\
-\textcolor{vscLineno}{12}\\
-\textcolor{vscLineno}{13}\\
-\textcolor{vscLineno}{14}\\
-\textcolor{vscLineno}{15}\\
-\textcolor{vscLineno}{16}\\
-\textcolor{vscLineno}{17}\\
-\textcolor{vscLineno}{18}\\
-\textcolor{vscLineno}{19}\\
-\textcolor{vscLineno}{20}\\
-\textcolor{vscLineno}{21}\\
-\textcolor{vscLineno}{22}\\
-\textcolor{vscLineno}{23}\\
-\textcolor{vscLineno}{24}\\
-\textcolor{vscLineno}{25}\\
-\textcolor{vscLineno}{26}\\
-\textcolor{vscLineno}{27}\\
-\textcolor{vscLineno}{28}\\
-\textcolor{vscLineno}{29}\\
-\textcolor{vscLineno}{30}\\
-\textcolor{vscLineno}{31}\\
-\textcolor{vscLineno}{32}\\
-\textcolor{vscLineno}{33}\\
-\textcolor{vscLineno}{34}\\
-\textcolor{vscLineno}{35}\\
-\textcolor{vscLineno}{36}\\
-\textcolor{vscLineno}{37}\\
-\textcolor{vscLineno}{38}\\
-\textcolor{vscLineno}{39}\\
-\textcolor{vscLineno}{40}\\
-\textcolor{vscLineno}{41}\\
-\textcolor{vscLineno}{42}\\
-\textcolor{vscLineno}{43}\\
-\textcolor{vscLineno}{44}\\
-\textcolor{vscLineno}{45}\\
-\textcolor{vscLineno}{46}\\
-\textcolor{vscLineno}{47}\\
-\textcolor{vscLineno}{48}\\
-\textcolor{vscLineno}{49}\\
-\textcolor{vscLineno}{50}\\
-\textcolor{vscLineno}{51}\\
-\textcolor{vscLineno}{52}\\
-\textcolor{vscLineno}{53}\\
-\textcolor{vscLineno}{54}\\
-\textcolor{vscLineno}{55}\\
-\textcolor{vscLineno}{56}\\
-\textcolor{vscLineno}{57}\\
-\textcolor{vscLineno}{58}\\
-\textcolor{vscLineno}{59}\\
-\textcolor{vscLineno}{60}\\
-\textcolor{vscLineno}{61}\\
-\textcolor{vscLineno}{62}\\
-\textcolor{vscLineno}{63}\\
-\textcolor{vscLineno}{64}\\
-\textcolor{vscLineno}{65}\\
-\textcolor{vscLineno}{66}\\
-\textcolor{vscLineno}{67}\\
-\textcolor{vscLineno}{68}\\
-\textcolor{vscLineno}{69}\\
-\textcolor{vscLineno}{70}\\
-\textcolor{vscLineno}{71}\\
-\textcolor{vscLineno}{72}\\
-\textcolor{vscLineno}{73}\\
-\textcolor{vscLineno}{74}\\
-\textcolor{vscLineno}{75}\\
-\textcolor{vscLineno}{76}\\
-\textcolor{vscLineno}{77}\\
+    \begin{minipage}[t]{2.0em}%
+      {\scriptsize\ttfamily\color{vscLineno}%
+       \raggedleft\setlength{\baselineskip}{1.45em}%
+    \textcolor{vscLineno}{1} \\
+    \textcolor{vscLineno}{2} \\
+    \textcolor{vscLineno}{3} \\
+    \textcolor{vscLineno}{4} \\
+    \textcolor{vscLineno}{5} \\
+    \textcolor{vscLineno}{6} \\
+    \textcolor{vscLineno}{7} \\
+    \textcolor{vscLineno}{8} \\
+    \textcolor{vscLineno}{9} \\
+    \textcolor{vscLineno}{10} \\
+    \textcolor{vscLineno}{11} \\
+    \textcolor{vscLineno}{12} \\
+    \textcolor{vscLineno}{13} \\
+    \textcolor{vscLineno}{14} \\
+    \textcolor{vscLineno}{15} \\
+    \textcolor{vscLineno}{16} \\
+    \textcolor{vscLineno}{17} \\
+    \textcolor{vscLineno}{18} \\
+    \textcolor{vscLineno}{19} \\
+    \textcolor{vscLineno}{20} \\
+    \textcolor{vscLineno}{21} \\
+    \textcolor{vscLineno}{22} \\
+    \textcolor{vscLineno}{23} \\
+    \textcolor{vscLineno}{24} \\
+    \textcolor{vscLineno}{25} \\
+    \textcolor{vscLineno}{26} \\
+    \textcolor{vscLineno}{27} \\
+    \textcolor{vscLineno}{28} \\
+    \textcolor{vscLineno}{29} \\
+    \textcolor{vscLineno}{30} \\
+    \textcolor{vscLineno}{31} \\
+    \textcolor{vscLineno}{32} \\
+    \textcolor{vscLineno}{33} \\
+    \textcolor{vscLineno}{34} \\
+    \textcolor{vscLineno}{35} \\
+    \textcolor{vscLineno}{36} \\
+    \textcolor{vscLineno}{37} \\
+    \textcolor{vscLineno}{38} \\
+    \textcolor{vscLineno}{39} \\
+    \textcolor{vscLineno}{40} \\
+    \textcolor{vscLineno}{41} \\
+    \textcolor{vscLineno}{42} \\
+    \textcolor{vscLineno}{43} \\
+    \textcolor{vscLineno}{44} \\
+    \textcolor{vscLineno}{45} \\
+    \textcolor{vscLineno}{46} \\
+    \textcolor{vscLineno}{47} \\
+    \textcolor{vscLineno}{48} \\
+    \textcolor{vscLineno}{49} \\
+    \textcolor{vscLineno}{50} \\
+    \textcolor{vscLineno}{51} \\
+    \textcolor{vscLineno}{52} \\
+    \textcolor{vscLineno}{53} \\
+    \textcolor{vscLineno}{54} \\
+    \textcolor{vscLineno}{55} \\
+    \textcolor{vscLineno}{56} \\
+    \textcolor{vscLineno}{57} \\
+    \textcolor{vscLineno}{58} \\
+    \textcolor{vscLineno}{59} \\
+    \textcolor{vscLineno}{60} \\
+    \textcolor{vscLineno}{61} \\
+    \textcolor{vscLineno}{62} \\
+    \textcolor{vscLineno}{63} \\
+    \textcolor{vscLineno}{64} \\
+    \textcolor{vscLineno}{65} \\
+    \textcolor{vscLineno}{66} \\
+    \textcolor{vscLineno}{67} \\
+    \textcolor{vscLineno}{68} \\
+    \textcolor{vscLineno}{69} \\
+    \textcolor{vscLineno}{70} \\
+    \textcolor{vscLineno}{71} \\
+    \textcolor{vscLineno}{72} \\
+    \textcolor{vscLineno}{73} \\
+    \textcolor{vscLineno}{74} \\
+    \textcolor{vscLineno}{75} \\
+    \textcolor{vscLineno}{76} \\
+    \textcolor{vscLineno}{77} \\
+      }%
     \end{minipage}%
-    \hspace{8pt}%
-    \begin{minipage}[t]{\dimexpr\linewidth-1.8em-8pt\relax}
-      \setlength{\baselineskip}{1.45em}
-      \raggedright
-\textcolor{vscKeyword}{import}\textcolor{vscDefault}{ }\textcolor{vscDefault}{numpy}\textcolor{vscDefault}{ }\textcolor{vscKeyword}{as}\textcolor{vscDefault}{ }\textcolor{vscDefault}{np}\\
-\textcolor{vscKeyword}{import}\textcolor{vscDefault}{ }\textcolor{vscDefault}{matplotlib}\textcolor{vscOperator}{.}\textcolor{vscDefault}{pyplot}\textcolor{vscDefault}{ }\textcolor{vscKeyword}{as}\textcolor{vscDefault}{ }\textcolor{vscDefault}{plt}\\
-\textcolor{vscKeyword}{from}\textcolor{vscDefault}{ }\textcolor{vscDefault}{sklearn}\textcolor{vscOperator}{.}\textcolor{vscDefault}{linear\_model}\textcolor{vscDefault}{ }\textcolor{vscKeyword}{import}\textcolor{vscDefault}{ }\textcolor{vscDefault}{LinearRegression}\\
-\textcolor{vscKeyword}{from}\textcolor{vscDefault}{ }\textcolor{vscDefault}{sklearn}\textcolor{vscOperator}{.}\textcolor{vscDefault}{model\_selection}\textcolor{vscDefault}{ }\textcolor{vscKeyword}{import}\textcolor{vscDefault}{ }\textcolor{vscDefault}{train\_test\_split}\\
-\textcolor{vscKeyword}{from}\textcolor{vscDefault}{ }\textcolor{vscDefault}{sklearn}\textcolor{vscOperator}{.}\textcolor{vscDefault}{metrics}\textcolor{vscDefault}{ }\textcolor{vscKeyword}{import}\textcolor{vscDefault}{ }\textcolor{vscDefault}{mean\_squared\_error}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{r2\_score}\\
-\\
-\\
-\textcolor{vscKeyword}{def}\textcolor{vscDefault}{ }\textcolor{vscFunction}{generate\_data}\textcolor{vscBracket}{(}\textcolor{vscDefault}{n}\textcolor{vscOperator}{:}\textcolor{vscDefault}{ }\textcolor{vscType}{int}\textcolor{vscDefault}{ }\textcolor{vscOperator}{=}\textcolor{vscDefault}{ }\textcolor{vscNumber}{100}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{noise}\textcolor{vscOperator}{:}\textcolor{vscDefault}{ }\textcolor{vscType}{float}\textcolor{vscDefault}{ }\textcolor{vscOperator}{=}\textcolor{vscDefault}{ }\textcolor{vscNumber}{10.0}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{seed}\textcolor{vscOperator}{:}\textcolor{vscDefault}{ }\textcolor{vscType}{int}\textcolor{vscDefault}{ }\textcolor{vscOperator}{=}\textcolor{vscDefault}{ }\textcolor{vscNumber}{42}\textcolor{vscBracket}{)}\textcolor{vscDefault}{ }\textcolor{vscOperator}{-\textgreater{}}\textcolor{vscDefault}{ }\textcolor{vscType}{tuple}\textcolor{vscOperator}{:}\\
-\textcolor{vscDefault}{    }\textcolor{vscString}{"""Generate synthetic linear regression data."""}\\
-\textcolor{vscDefault}{    }\textcolor{vscDefault}{rng}\textcolor{vscDefault}{ }\textcolor{vscOperator}{=}\textcolor{vscDefault}{ }\textcolor{vscDefault}{np}\textcolor{vscOperator}{.}\textcolor{vscDefault}{random}\textcolor{vscOperator}{.}\textcolor{vscDefault}{default\_rng}\textcolor{vscBracket}{(}\textcolor{vscDefault}{seed}\textcolor{vscBracket}{)}\\
-\textcolor{vscDefault}{    }\textcolor{vscDefault}{X}\textcolor{vscDefault}{ }\textcolor{vscOperator}{=}\textcolor{vscDefault}{ }\textcolor{vscDefault}{rng}\textcolor{vscOperator}{.}\textcolor{vscDefault}{uniform}\textcolor{vscBracket}{(}\textcolor{vscNumber}{0}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscNumber}{100}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{size}\textcolor{vscOperator}{=}\textcolor{vscBracket}{(}\textcolor{vscDefault}{n}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscNumber}{1}\textcolor{vscBracket}{)}\textcolor{vscBracket}{)}\\
-\textcolor{vscDefault}{    }\textcolor{vscDefault}{true\_slope}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{true\_intercept}\textcolor{vscDefault}{ }\textcolor{vscOperator}{=}\textcolor{vscDefault}{ }\textcolor{vscNumber}{2.5}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscNumber}{15.0}\\
-\textcolor{vscDefault}{    }\textcolor{vscDefault}{y}\textcolor{vscDefault}{ }\textcolor{vscOperator}{=}\textcolor{vscDefault}{ }\textcolor{vscDefault}{true\_slope}\textcolor{vscDefault}{ }\textcolor{vscOperator}{*}\textcolor{vscDefault}{ }\textcolor{vscDefault}{X}\textcolor{vscOperator}{.}\textcolor{vscDefault}{squeeze}\textcolor{vscBracket}{(}\textcolor{vscBracket}{)}\textcolor{vscDefault}{ }\textcolor{vscOperator}{+}\textcolor{vscDefault}{ }\textcolor{vscDefault}{true\_intercept}\textcolor{vscDefault}{ }\textcolor{vscOperator}{+}\textcolor{vscDefault}{ }\textcolor{vscDefault}{rng}\textcolor{vscOperator}{.}\textcolor{vscDefault}{normal}\textcolor{vscBracket}{(}\textcolor{vscNumber}{0}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{noise}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{size}\textcolor{vscOperator}{=}\textcolor{vscDefault}{n}\textcolor{vscBracket}{)}\\
-\textcolor{vscDefault}{    }\textcolor{vscKeyword}{return}\textcolor{vscDefault}{ }\textcolor{vscDefault}{X}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{y}\\
-\\
-\\
-\textcolor{vscKeyword}{def}\textcolor{vscDefault}{ }\textcolor{vscFunction}{fit\_and\_evaluate}\textcolor{vscBracket}{(}\textcolor{vscDefault}{X}\textcolor{vscOperator}{:}\textcolor{vscDefault}{ }\textcolor{vscDefault}{np}\textcolor{vscOperator}{.}\textcolor{vscDefault}{ndarray}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{y}\textcolor{vscOperator}{:}\textcolor{vscDefault}{ }\textcolor{vscDefault}{np}\textcolor{vscOperator}{.}\textcolor{vscDefault}{ndarray}\textcolor{vscBracket}{)}\textcolor{vscDefault}{ }\textcolor{vscOperator}{-\textgreater{}}\textcolor{vscDefault}{ }\textcolor{vscType}{dict}\textcolor{vscOperator}{:}\\
-\textcolor{vscDefault}{    }\textcolor{vscString}{"""Fit a linear regression model and return evaluation metrics."""}\\
-\textcolor{vscDefault}{    }\textcolor{vscDefault}{X\_train}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{X\_test}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{y\_train}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{y\_test}\textcolor{vscDefault}{ }\textcolor{vscOperator}{=}\textcolor{vscDefault}{ }\textcolor{vscDefault}{train\_test\_split}\textcolor{vscBracket}{(}\\
-\textcolor{vscDefault}{        }\textcolor{vscDefault}{X}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{y}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{test\_size}\textcolor{vscOperator}{=}\textcolor{vscNumber}{0.2}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{random\_state}\textcolor{vscOperator}{=}\textcolor{vscNumber}{42}\\
-\textcolor{vscDefault}{    }\textcolor{vscBracket}{)}\\
-\\
-\textcolor{vscDefault}{    }\textcolor{vscDefault}{model}\textcolor{vscDefault}{ }\textcolor{vscOperator}{=}\textcolor{vscDefault}{ }\textcolor{vscDefault}{LinearRegression}\textcolor{vscBracket}{(}\textcolor{vscBracket}{)}\\
-\textcolor{vscDefault}{    }\textcolor{vscDefault}{model}\textcolor{vscOperator}{.}\textcolor{vscDefault}{fit}\textcolor{vscBracket}{(}\textcolor{vscDefault}{X\_train}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{y\_train}\textcolor{vscBracket}{)}\\
-\textcolor{vscDefault}{    }\textcolor{vscDefault}{y\_pred}\textcolor{vscDefault}{ }\textcolor{vscOperator}{=}\textcolor{vscDefault}{ }\textcolor{vscDefault}{model}\textcolor{vscOperator}{.}\textcolor{vscDefault}{predict}\textcolor{vscBracket}{(}\textcolor{vscDefault}{X\_test}\textcolor{vscBracket}{)}\\
-\\
-\textcolor{vscDefault}{    }\textcolor{vscKeyword}{return}\textcolor{vscDefault}{ }\textcolor{vscBracket}{\{}\\
-\textcolor{vscDefault}{        }\textcolor{vscString}{"model"}\textcolor{vscOperator}{:}\textcolor{vscDefault}{ }\textcolor{vscDefault}{model}\textcolor{vscOperator}{,}\\
-\textcolor{vscDefault}{        }\textcolor{vscString}{"X\_test"}\textcolor{vscOperator}{:}\textcolor{vscDefault}{ }\textcolor{vscDefault}{X\_test}\textcolor{vscOperator}{,}\\
-\textcolor{vscDefault}{        }\textcolor{vscString}{"y\_test"}\textcolor{vscOperator}{:}\textcolor{vscDefault}{ }\textcolor{vscDefault}{y\_test}\textcolor{vscOperator}{,}\\
-\textcolor{vscDefault}{        }\textcolor{vscString}{"y\_pred"}\textcolor{vscOperator}{:}\textcolor{vscDefault}{ }\textcolor{vscDefault}{y\_pred}\textcolor{vscOperator}{,}\\
-\textcolor{vscDefault}{        }\textcolor{vscString}{"rmse"}\textcolor{vscOperator}{:}\textcolor{vscDefault}{ }\textcolor{vscDefault}{np}\textcolor{vscOperator}{.}\textcolor{vscDefault}{sqrt}\textcolor{vscBracket}{(}\textcolor{vscDefault}{mean\_squared\_error}\textcolor{vscBracket}{(}\textcolor{vscDefault}{y\_test}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{y\_pred}\textcolor{vscBracket}{)}\textcolor{vscBracket}{)}\textcolor{vscOperator}{,}\\
-\textcolor{vscDefault}{        }\textcolor{vscString}{"r2"}\textcolor{vscOperator}{:}\textcolor{vscDefault}{ }\textcolor{vscDefault}{r2\_score}\textcolor{vscBracket}{(}\textcolor{vscDefault}{y\_test}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{y\_pred}\textcolor{vscBracket}{)}\textcolor{vscOperator}{,}\\
-\textcolor{vscDefault}{        }\textcolor{vscString}{"coef"}\textcolor{vscOperator}{:}\textcolor{vscDefault}{ }\textcolor{vscDefault}{model}\textcolor{vscOperator}{.}\textcolor{vscDefault}{coef\_}\textcolor{vscBracket}{[}\textcolor{vscNumber}{0}\textcolor{vscBracket}{]}\textcolor{vscOperator}{,}\\
-\textcolor{vscDefault}{        }\textcolor{vscString}{"intercept"}\textcolor{vscOperator}{:}\textcolor{vscDefault}{ }\textcolor{vscDefault}{model}\textcolor{vscOperator}{.}\textcolor{vscDefault}{intercept\_}\textcolor{vscOperator}{,}\\
-\textcolor{vscDefault}{    }\textcolor{vscBracket}{\}}\\
-\\
-\\
-\textcolor{vscKeyword}{def}\textcolor{vscDefault}{ }\textcolor{vscFunction}{plot\_results}\textcolor{vscBracket}{(}\textcolor{vscDefault}{results}\textcolor{vscOperator}{:}\textcolor{vscDefault}{ }\textcolor{vscType}{dict}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{X}\textcolor{vscOperator}{:}\textcolor{vscDefault}{ }\textcolor{vscDefault}{np}\textcolor{vscOperator}{.}\textcolor{vscDefault}{ndarray}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{y}\textcolor{vscOperator}{:}\textcolor{vscDefault}{ }\textcolor{vscDefault}{np}\textcolor{vscOperator}{.}\textcolor{vscDefault}{ndarray}\textcolor{vscBracket}{)}\textcolor{vscDefault}{ }\textcolor{vscOperator}{-\textgreater{}}\textcolor{vscDefault}{ }\textcolor{vscKeyword}{None}\textcolor{vscOperator}{:}\\
-\textcolor{vscDefault}{    }\textcolor{vscString}{"""Plot the data and fitted regression line."""}\\
-\textcolor{vscDefault}{    }\textcolor{vscDefault}{fig}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{axes}\textcolor{vscDefault}{ }\textcolor{vscOperator}{=}\textcolor{vscDefault}{ }\textcolor{vscDefault}{plt}\textcolor{vscOperator}{.}\textcolor{vscDefault}{subplots}\textcolor{vscBracket}{(}\textcolor{vscNumber}{1}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscNumber}{2}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{figsize}\textcolor{vscOperator}{=}\textcolor{vscBracket}{(}\textcolor{vscNumber}{12}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscNumber}{5}\textcolor{vscBracket}{)}\textcolor{vscBracket}{)}\\
-\\
-\textcolor{vscDefault}{    }\textcolor{vscComment}{\# Scatter plot with regression line}\\
-\textcolor{vscDefault}{    }\textcolor{vscDefault}{ax}\textcolor{vscDefault}{ }\textcolor{vscOperator}{=}\textcolor{vscDefault}{ }\textcolor{vscDefault}{axes}\textcolor{vscBracket}{[}\textcolor{vscNumber}{0}\textcolor{vscBracket}{]}\\
-\textcolor{vscDefault}{    }\textcolor{vscDefault}{ax}\textcolor{vscOperator}{.}\textcolor{vscDefault}{scatter}\textcolor{vscBracket}{(}\textcolor{vscDefault}{X}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{y}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{alpha}\textcolor{vscOperator}{=}\textcolor{vscNumber}{0.5}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{label}\textcolor{vscOperator}{=}\textcolor{vscString}{"Data"}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{color}\textcolor{vscOperator}{=}\textcolor{vscString}{"steelblue"}\textcolor{vscBracket}{)}\\
-\textcolor{vscDefault}{    }\textcolor{vscDefault}{x\_line}\textcolor{vscDefault}{ }\textcolor{vscOperator}{=}\textcolor{vscDefault}{ }\textcolor{vscDefault}{np}\textcolor{vscOperator}{.}\textcolor{vscDefault}{linspace}\textcolor{vscBracket}{(}\textcolor{vscDefault}{X}\textcolor{vscOperator}{.}\textcolor{vscDefault}{min}\textcolor{vscBracket}{(}\textcolor{vscBracket}{)}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{X}\textcolor{vscOperator}{.}\textcolor{vscDefault}{max}\textcolor{vscBracket}{(}\textcolor{vscBracket}{)}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscNumber}{200}\textcolor{vscBracket}{)}\textcolor{vscOperator}{.}\textcolor{vscDefault}{reshape}\textcolor{vscBracket}{(}\textcolor{vscOperator}{-}\textcolor{vscNumber}{1}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscNumber}{1}\textcolor{vscBracket}{)}\\
-\textcolor{vscDefault}{    }\textcolor{vscDefault}{ax}\textcolor{vscOperator}{.}\textcolor{vscDefault}{plot}\textcolor{vscBracket}{(}\textcolor{vscDefault}{x\_line}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{results}\textcolor{vscBracket}{[}\textcolor{vscString}{"model"}\textcolor{vscBracket}{]}\textcolor{vscOperator}{.}\textcolor{vscDefault}{predict}\textcolor{vscBracket}{(}\textcolor{vscDefault}{x\_line}\textcolor{vscBracket}{)}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{color}\textcolor{vscOperator}{=}\textcolor{vscString}{"crimson"}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{lw}\textcolor{vscOperator}{=}\textcolor{vscNumber}{2}\textcolor{vscOperator}{,}\\
-\textcolor{vscDefault}{            }\textcolor{vscDefault}{label}\textcolor{vscOperator}{=}\textcolor{vscDefault}{f"}\textcolor{vscDefault}{Fit: y = }\textcolor{vscBracket}{\{}\textcolor{vscDefault}{results}\textcolor{vscBracket}{[}\textcolor{vscString}{'coef'}\textcolor{vscBracket}{]}\textcolor{vscOperator}{:}\textcolor{vscDefault}{.2f}\textcolor{vscBracket}{\}}\textcolor{vscDefault}{x + }\textcolor{vscBracket}{\{}\textcolor{vscDefault}{results}\textcolor{vscBracket}{[}\textcolor{vscString}{'intercept'}\textcolor{vscBracket}{]}\textcolor{vscOperator}{:}\textcolor{vscDefault}{.2f}\textcolor{vscBracket}{\}}\textcolor{vscDefault}{"}\textcolor{vscBracket}{)}\\
-\textcolor{vscDefault}{    }\textcolor{vscDefault}{ax}\textcolor{vscOperator}{.}\textcolor{vscDefault}{set\_xlabel}\textcolor{vscBracket}{(}\textcolor{vscString}{"X"}\textcolor{vscBracket}{)}\\
-\textcolor{vscDefault}{    }\textcolor{vscDefault}{ax}\textcolor{vscOperator}{.}\textcolor{vscDefault}{set\_ylabel}\textcolor{vscBracket}{(}\textcolor{vscString}{"y"}\textcolor{vscBracket}{)}\\
-\textcolor{vscDefault}{    }\textcolor{vscDefault}{ax}\textcolor{vscOperator}{.}\textcolor{vscDefault}{set\_title}\textcolor{vscBracket}{(}\textcolor{vscString}{"Linear Regression Fit"}\textcolor{vscBracket}{)}\\
-\textcolor{vscDefault}{    }\textcolor{vscDefault}{ax}\textcolor{vscOperator}{.}\textcolor{vscDefault}{legend}\textcolor{vscBracket}{(}\textcolor{vscBracket}{)}\\
-\\
-\textcolor{vscDefault}{    }\textcolor{vscComment}{\# Residuals plot}\\
-\textcolor{vscDefault}{    }\textcolor{vscDefault}{ax}\textcolor{vscDefault}{ }\textcolor{vscOperator}{=}\textcolor{vscDefault}{ }\textcolor{vscDefault}{axes}\textcolor{vscBracket}{[}\textcolor{vscNumber}{1}\textcolor{vscBracket}{]}\\
-\textcolor{vscDefault}{    }\textcolor{vscDefault}{residuals}\textcolor{vscDefault}{ }\textcolor{vscOperator}{=}\textcolor{vscDefault}{ }\textcolor{vscDefault}{results}\textcolor{vscBracket}{[}\textcolor{vscString}{"y\_test"}\textcolor{vscBracket}{]}\textcolor{vscDefault}{ }\textcolor{vscOperator}{-}\textcolor{vscDefault}{ }\textcolor{vscDefault}{results}\textcolor{vscBracket}{[}\textcolor{vscString}{"y\_pred"}\textcolor{vscBracket}{]}\\
-\textcolor{vscDefault}{    }\textcolor{vscDefault}{ax}\textcolor{vscOperator}{.}\textcolor{vscDefault}{scatter}\textcolor{vscBracket}{(}\textcolor{vscDefault}{results}\textcolor{vscBracket}{[}\textcolor{vscString}{"y\_pred"}\textcolor{vscBracket}{]}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{residuals}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{alpha}\textcolor{vscOperator}{=}\textcolor{vscNumber}{0.6}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{color}\textcolor{vscOperator}{=}\textcolor{vscString}{"darkorange"}\textcolor{vscBracket}{)}\\
-\textcolor{vscDefault}{    }\textcolor{vscDefault}{ax}\textcolor{vscOperator}{.}\textcolor{vscDefault}{axhline}\textcolor{vscBracket}{(}\textcolor{vscNumber}{0}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{color}\textcolor{vscOperator}{=}\textcolor{vscString}{"black"}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{lw}\textcolor{vscOperator}{=}\textcolor{vscNumber}{1}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{linestyle}\textcolor{vscOperator}{=}\textcolor{vscString}{"--"}\textcolor{vscBracket}{)}\\
-\textcolor{vscDefault}{    }\textcolor{vscDefault}{ax}\textcolor{vscOperator}{.}\textcolor{vscDefault}{set\_xlabel}\textcolor{vscBracket}{(}\textcolor{vscString}{"Predicted"}\textcolor{vscBracket}{)}\\
-\textcolor{vscDefault}{    }\textcolor{vscDefault}{ax}\textcolor{vscOperator}{.}\textcolor{vscDefault}{set\_ylabel}\textcolor{vscBracket}{(}\textcolor{vscString}{"Residuals"}\textcolor{vscBracket}{)}\\
-\textcolor{vscDefault}{    }\textcolor{vscDefault}{ax}\textcolor{vscOperator}{.}\textcolor{vscDefault}{set\_title}\textcolor{vscBracket}{(}\textcolor{vscDefault}{f"}\textcolor{vscDefault}{Residuals  (RMSE=}\textcolor{vscBracket}{\{}\textcolor{vscDefault}{results}\textcolor{vscBracket}{[}\textcolor{vscString}{'rmse'}\textcolor{vscBracket}{]}\textcolor{vscOperator}{:}\textcolor{vscDefault}{.2f}\textcolor{vscBracket}{\}}\textcolor{vscDefault}{, R²=}\textcolor{vscBracket}{\{}\textcolor{vscDefault}{results}\textcolor{vscBracket}{[}\textcolor{vscString}{'r2'}\textcolor{vscBracket}{]}\textcolor{vscOperator}{:}\textcolor{vscDefault}{.3f}\textcolor{vscBracket}{\}}\textcolor{vscDefault}{)}\textcolor{vscDefault}{"}\textcolor{vscBracket}{)}\\
-\\
-\textcolor{vscDefault}{    }\textcolor{vscDefault}{plt}\textcolor{vscOperator}{.}\textcolor{vscDefault}{tight\_layout}\textcolor{vscBracket}{(}\textcolor{vscBracket}{)}\\
-\textcolor{vscDefault}{    }\textcolor{vscDefault}{plt}\textcolor{vscOperator}{.}\textcolor{vscDefault}{savefig}\textcolor{vscBracket}{(}\textcolor{vscString}{"images/linear\_regression\_results.png"}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{dpi}\textcolor{vscOperator}{=}\textcolor{vscNumber}{150}\textcolor{vscBracket}{)}\\
-\textcolor{vscDefault}{    }\textcolor{vscDefault}{plt}\textcolor{vscOperator}{.}\textcolor{vscDefault}{show}\textcolor{vscBracket}{(}\textcolor{vscBracket}{)}\\
-\\
-\\
-\textcolor{vscKeyword}{if}\textcolor{vscDefault}{ }\textcolor{vscDefault}{\_\_name\_\_}\textcolor{vscDefault}{ }\textcolor{vscOperator}{==}\textcolor{vscDefault}{ }\textcolor{vscString}{"\_\_main\_\_"}\textcolor{vscOperator}{:}\\
-\textcolor{vscDefault}{    }\textcolor{vscDefault}{X}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{y}\textcolor{vscDefault}{ }\textcolor{vscOperator}{=}\textcolor{vscDefault}{ }\textcolor{vscDefault}{generate\_data}\textcolor{vscBracket}{(}\textcolor{vscDefault}{n}\textcolor{vscOperator}{=}\textcolor{vscNumber}{200}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{noise}\textcolor{vscOperator}{=}\textcolor{vscNumber}{12.0}\textcolor{vscBracket}{)}\\
-\textcolor{vscDefault}{    }\textcolor{vscDefault}{results}\textcolor{vscDefault}{ }\textcolor{vscOperator}{=}\textcolor{vscDefault}{ }\textcolor{vscDefault}{fit\_and\_evaluate}\textcolor{vscBracket}{(}\textcolor{vscDefault}{X}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{y}\textcolor{vscBracket}{)}\\
-\\
-\textcolor{vscDefault}{    }\textcolor{vscDefault}{print}\textcolor{vscBracket}{(}\textcolor{vscDefault}{f"}\textcolor{vscDefault}{Coefficient : }\textcolor{vscBracket}{\{}\textcolor{vscDefault}{results}\textcolor{vscBracket}{[}\textcolor{vscString}{'coef'}\textcolor{vscBracket}{]}\textcolor{vscOperator}{:}\textcolor{vscDefault}{.4f}\textcolor{vscBracket}{\}}\textcolor{vscDefault}{"}\textcolor{vscBracket}{)}\\
-\textcolor{vscDefault}{    }\textcolor{vscDefault}{print}\textcolor{vscBracket}{(}\textcolor{vscDefault}{f"}\textcolor{vscDefault}{Intercept   : }\textcolor{vscBracket}{\{}\textcolor{vscDefault}{results}\textcolor{vscBracket}{[}\textcolor{vscString}{'intercept'}\textcolor{vscBracket}{]}\textcolor{vscOperator}{:}\textcolor{vscDefault}{.4f}\textcolor{vscBracket}{\}}\textcolor{vscDefault}{"}\textcolor{vscBracket}{)}\\
-\textcolor{vscDefault}{    }\textcolor{vscDefault}{print}\textcolor{vscBracket}{(}\textcolor{vscDefault}{f"}\textcolor{vscDefault}{RMSE        : }\textcolor{vscBracket}{\{}\textcolor{vscDefault}{results}\textcolor{vscBracket}{[}\textcolor{vscString}{'rmse'}\textcolor{vscBracket}{]}\textcolor{vscOperator}{:}\textcolor{vscDefault}{.4f}\textcolor{vscBracket}{\}}\textcolor{vscDefault}{"}\textcolor{vscBracket}{)}\\
-\textcolor{vscDefault}{    }\textcolor{vscDefault}{print}\textcolor{vscBracket}{(}\textcolor{vscDefault}{f"}\textcolor{vscDefault}{R²          : }\textcolor{vscBracket}{\{}\textcolor{vscDefault}{results}\textcolor{vscBracket}{[}\textcolor{vscString}{'r2'}\textcolor{vscBracket}{]}\textcolor{vscOperator}{:}\textcolor{vscDefault}{.4f}\textcolor{vscBracket}{\}}\textcolor{vscDefault}{"}\textcolor{vscBracket}{)}\\
-\\
-\textcolor{vscDefault}{    }\textcolor{vscDefault}{plot\_results}\textcolor{vscBracket}{(}\textcolor{vscDefault}{results}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{X}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{y}\textcolor{vscBracket}{)}\\
+    \hspace{4pt}%
+    \begin{minipage}[t]{\dimexpr\linewidth-2.0em-4pt\relax}%
+      \begin{alltt}%
+\textcolor{vscDefault}{\scriptsize\ttfamily%
+\textcolor{vscKeyword}{import}\textcolor{vscDefault}{ }\textcolor{vscDefault}{numpy}\textcolor{vscDefault}{ }\textcolor{vscKeyword}{as}\textcolor{vscDefault}{ }\textcolor{vscDefault}{np}
+\textcolor{vscKeyword}{import}\textcolor{vscDefault}{ }\textcolor{vscDefault}{matplotlib}\textcolor{vscOperator}{.}\textcolor{vscDefault}{pyplot}\textcolor{vscDefault}{ }\textcolor{vscKeyword}{as}\textcolor{vscDefault}{ }\textcolor{vscDefault}{plt}
+\textcolor{vscKeyword}{from}\textcolor{vscDefault}{ }\textcolor{vscDefault}{sklearn}\textcolor{vscOperator}{.}\textcolor{vscDefault}{linear\_model}\textcolor{vscDefault}{ }\textcolor{vscKeyword}{import}\textcolor{vscDefault}{ }\textcolor{vscDefault}{LinearRegression}
+\textcolor{vscKeyword}{from}\textcolor{vscDefault}{ }\textcolor{vscDefault}{sklearn}\textcolor{vscOperator}{.}\textcolor{vscDefault}{model\_selection}\textcolor{vscDefault}{ }\textcolor{vscKeyword}{import}\textcolor{vscDefault}{ }\textcolor{vscDefault}{train\_test\_split}
+\textcolor{vscKeyword}{from}\textcolor{vscDefault}{ }\textcolor{vscDefault}{sklearn}\textcolor{vscOperator}{.}\textcolor{vscDefault}{metrics}\textcolor{vscDefault}{ }\textcolor{vscKeyword}{import}\textcolor{vscDefault}{ }\textcolor{vscDefault}{mean\_squared\_error}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{r2\_score}
+\mbox{}
+\mbox{}
+\textcolor{vscKeyword}{def}\textcolor{vscDefault}{ }\textcolor{vscFunction}{generate\_data}\textcolor{vscBracket}{(}\textcolor{vscDefault}{n}\textcolor{vscOperator}{:}\textcolor{vscDefault}{ }\textcolor{vscType}{int}\textcolor{vscDefault}{ }\textcolor{vscOperator}{=}\textcolor{vscDefault}{ }\textcolor{vscNumber}{100}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{noise}\textcolor{vscOperator}{:}\textcolor{vscDefault}{ }\textcolor{vscType}{float}\textcolor{vscDefault}{ }\textcolor{vscOperator}{=}\textcolor{vscDefault}{ }\textcolor{vscNumber}{10.0}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{seed}\textcolor{vscOperator}{:}\textcolor{vscDefault}{ }\textcolor{vscType}{int}\textcolor{vscDefault}{ }\textcolor{vscOperator}{=}\textcolor{vscDefault}{ }\textcolor{vscNumber}{42}\textcolor{vscBracket}{)}\textcolor{vscDefault}{ }\textcolor{vscOperator}{-\textgreater{}}\textcolor{vscDefault}{ }\textcolor{vscType}{tuple}\textcolor{vscOperator}{:}
+\textcolor{vscDefault}{    }\textcolor{vscString}{"""Generate synthetic linear regression data."""}
+\textcolor{vscDefault}{    }\textcolor{vscDefault}{rng}\textcolor{vscDefault}{ }\textcolor{vscOperator}{=}\textcolor{vscDefault}{ }\textcolor{vscDefault}{np}\textcolor{vscOperator}{.}\textcolor{vscDefault}{random}\textcolor{vscOperator}{.}\textcolor{vscDefault}{default\_rng}\textcolor{vscBracket}{(}\textcolor{vscDefault}{seed}\textcolor{vscBracket}{)}
+\textcolor{vscDefault}{    }\textcolor{vscDefault}{X}\textcolor{vscDefault}{ }\textcolor{vscOperator}{=}\textcolor{vscDefault}{ }\textcolor{vscDefault}{rng}\textcolor{vscOperator}{.}\textcolor{vscDefault}{uniform}\textcolor{vscBracket}{(}\textcolor{vscNumber}{0}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscNumber}{100}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{size}\textcolor{vscOperator}{=}\textcolor{vscBracket}{(}\textcolor{vscDefault}{n}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscNumber}{1}\textcolor{vscBracket}{)}\textcolor{vscBracket}{)}
+\textcolor{vscDefault}{    }\textcolor{vscDefault}{true\_slope}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{true\_intercept}\textcolor{vscDefault}{ }\textcolor{vscOperator}{=}\textcolor{vscDefault}{ }\textcolor{vscNumber}{2.5}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscNumber}{15.0}
+\textcolor{vscDefault}{    }\textcolor{vscDefault}{y}\textcolor{vscDefault}{ }\textcolor{vscOperator}{=}\textcolor{vscDefault}{ }\textcolor{vscDefault}{true\_slope}\textcolor{vscDefault}{ }\textcolor{vscOperator}{*}\textcolor{vscDefault}{ }\textcolor{vscDefault}{X}\textcolor{vscOperator}{.}\textcolor{vscDefault}{squeeze}\textcolor{vscBracket}{(}\textcolor{vscBracket}{)}\textcolor{vscDefault}{ }\textcolor{vscOperator}{+}\textcolor{vscDefault}{ }\textcolor{vscDefault}{true\_intercept}\textcolor{vscDefault}{ }\textcolor{vscOperator}{+}\textcolor{vscDefault}{ }\textcolor{vscDefault}{rng}\textcolor{vscOperator}{.}\textcolor{vscDefault}{normal}\textcolor{vscBracket}{(}\textcolor{vscNumber}{0}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{noise}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{size}\textcolor{vscOperator}{=}\textcolor{vscDefault}{n}\textcolor{vscBracket}{)}
+\textcolor{vscDefault}{    }\textcolor{vscKeyword}{return}\textcolor{vscDefault}{ }\textcolor{vscDefault}{X}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{y}
+\mbox{}
+\mbox{}
+\textcolor{vscKeyword}{def}\textcolor{vscDefault}{ }\textcolor{vscFunction}{fit\_and\_evaluate}\textcolor{vscBracket}{(}\textcolor{vscDefault}{X}\textcolor{vscOperator}{:}\textcolor{vscDefault}{ }\textcolor{vscDefault}{np}\textcolor{vscOperator}{.}\textcolor{vscDefault}{ndarray}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{y}\textcolor{vscOperator}{:}\textcolor{vscDefault}{ }\textcolor{vscDefault}{np}\textcolor{vscOperator}{.}\textcolor{vscDefault}{ndarray}\textcolor{vscBracket}{)}\textcolor{vscDefault}{ }\textcolor{vscOperator}{-\textgreater{}}\textcolor{vscDefault}{ }\textcolor{vscType}{dict}\textcolor{vscOperator}{:}
+\textcolor{vscDefault}{    }\textcolor{vscString}{"""Fit a linear regression model and return evaluation metrics."""}
+\textcolor{vscDefault}{    }\textcolor{vscDefault}{X\_train}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{X\_test}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{y\_train}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{y\_test}\textcolor{vscDefault}{ }\textcolor{vscOperator}{=}\textcolor{vscDefault}{ }\textcolor{vscDefault}{train\_test\_split}\textcolor{vscBracket}{(}
+\textcolor{vscDefault}{        }\textcolor{vscDefault}{X}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{y}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{test\_size}\textcolor{vscOperator}{=}\textcolor{vscNumber}{0.2}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{random\_state}\textcolor{vscOperator}{=}\textcolor{vscNumber}{42}
+\textcolor{vscDefault}{    }\textcolor{vscBracket}{)}
+\mbox{}
+\textcolor{vscDefault}{    }\textcolor{vscDefault}{model}\textcolor{vscDefault}{ }\textcolor{vscOperator}{=}\textcolor{vscDefault}{ }\textcolor{vscDefault}{LinearRegression}\textcolor{vscBracket}{(}\textcolor{vscBracket}{)}
+\textcolor{vscDefault}{    }\textcolor{vscDefault}{model}\textcolor{vscOperator}{.}\textcolor{vscDefault}{fit}\textcolor{vscBracket}{(}\textcolor{vscDefault}{X\_train}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{y\_train}\textcolor{vscBracket}{)}
+\textcolor{vscDefault}{    }\textcolor{vscDefault}{y\_pred}\textcolor{vscDefault}{ }\textcolor{vscOperator}{=}\textcolor{vscDefault}{ }\textcolor{vscDefault}{model}\textcolor{vscOperator}{.}\textcolor{vscDefault}{predict}\textcolor{vscBracket}{(}\textcolor{vscDefault}{X\_test}\textcolor{vscBracket}{)}
+\mbox{}
+\textcolor{vscDefault}{    }\textcolor{vscKeyword}{return}\textcolor{vscDefault}{ }\textcolor{vscBracket}{\{}
+\textcolor{vscDefault}{        }\textcolor{vscString}{"model"}\textcolor{vscOperator}{:}\textcolor{vscDefault}{ }\textcolor{vscDefault}{model}\textcolor{vscOperator}{,}
+\textcolor{vscDefault}{        }\textcolor{vscString}{"X\_test"}\textcolor{vscOperator}{:}\textcolor{vscDefault}{ }\textcolor{vscDefault}{X\_test}\textcolor{vscOperator}{,}
+\textcolor{vscDefault}{        }\textcolor{vscString}{"y\_test"}\textcolor{vscOperator}{:}\textcolor{vscDefault}{ }\textcolor{vscDefault}{y\_test}\textcolor{vscOperator}{,}
+\textcolor{vscDefault}{        }\textcolor{vscString}{"y\_pred"}\textcolor{vscOperator}{:}\textcolor{vscDefault}{ }\textcolor{vscDefault}{y\_pred}\textcolor{vscOperator}{,}
+\textcolor{vscDefault}{        }\textcolor{vscString}{"rmse"}\textcolor{vscOperator}{:}\textcolor{vscDefault}{ }\textcolor{vscDefault}{np}\textcolor{vscOperator}{.}\textcolor{vscDefault}{sqrt}\textcolor{vscBracket}{(}\textcolor{vscDefault}{mean\_squared\_error}\textcolor{vscBracket}{(}\textcolor{vscDefault}{y\_test}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{y\_pred}\textcolor{vscBracket}{)}\textcolor{vscBracket}{)}\textcolor{vscOperator}{,}
+\textcolor{vscDefault}{        }\textcolor{vscString}{"r2"}\textcolor{vscOperator}{:}\textcolor{vscDefault}{ }\textcolor{vscDefault}{r2\_score}\textcolor{vscBracket}{(}\textcolor{vscDefault}{y\_test}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{y\_pred}\textcolor{vscBracket}{)}\textcolor{vscOperator}{,}
+\textcolor{vscDefault}{        }\textcolor{vscString}{"coef"}\textcolor{vscOperator}{:}\textcolor{vscDefault}{ }\textcolor{vscDefault}{model}\textcolor{vscOperator}{.}\textcolor{vscDefault}{coef\_}\textcolor{vscBracket}{[}\textcolor{vscNumber}{0}\textcolor{vscBracket}{]}\textcolor{vscOperator}{,}
+\textcolor{vscDefault}{        }\textcolor{vscString}{"intercept"}\textcolor{vscOperator}{:}\textcolor{vscDefault}{ }\textcolor{vscDefault}{model}\textcolor{vscOperator}{.}\textcolor{vscDefault}{intercept\_}\textcolor{vscOperator}{,}
+\textcolor{vscDefault}{    }\textcolor{vscBracket}{\}}
+\mbox{}
+\mbox{}
+\textcolor{vscKeyword}{def}\textcolor{vscDefault}{ }\textcolor{vscFunction}{plot\_results}\textcolor{vscBracket}{(}\textcolor{vscDefault}{results}\textcolor{vscOperator}{:}\textcolor{vscDefault}{ }\textcolor{vscType}{dict}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{X}\textcolor{vscOperator}{:}\textcolor{vscDefault}{ }\textcolor{vscDefault}{np}\textcolor{vscOperator}{.}\textcolor{vscDefault}{ndarray}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{y}\textcolor{vscOperator}{:}\textcolor{vscDefault}{ }\textcolor{vscDefault}{np}\textcolor{vscOperator}{.}\textcolor{vscDefault}{ndarray}\textcolor{vscBracket}{)}\textcolor{vscDefault}{ }\textcolor{vscOperator}{-\textgreater{}}\textcolor{vscDefault}{ }\textcolor{vscKeyword}{None}\textcolor{vscOperator}{:}
+\textcolor{vscDefault}{    }\textcolor{vscString}{"""Plot the data and fitted regression line."""}
+\textcolor{vscDefault}{    }\textcolor{vscDefault}{fig}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{axes}\textcolor{vscDefault}{ }\textcolor{vscOperator}{=}\textcolor{vscDefault}{ }\textcolor{vscDefault}{plt}\textcolor{vscOperator}{.}\textcolor{vscDefault}{subplots}\textcolor{vscBracket}{(}\textcolor{vscNumber}{1}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscNumber}{2}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{figsize}\textcolor{vscOperator}{=}\textcolor{vscBracket}{(}\textcolor{vscNumber}{12}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscNumber}{5}\textcolor{vscBracket}{)}\textcolor{vscBracket}{)}
+\mbox{}
+\textcolor{vscDefault}{    }\textcolor{vscComment}{\# Scatter plot with regression line}
+\textcolor{vscDefault}{    }\textcolor{vscDefault}{ax}\textcolor{vscDefault}{ }\textcolor{vscOperator}{=}\textcolor{vscDefault}{ }\textcolor{vscDefault}{axes}\textcolor{vscBracket}{[}\textcolor{vscNumber}{0}\textcolor{vscBracket}{]}
+\textcolor{vscDefault}{    }\textcolor{vscDefault}{ax}\textcolor{vscOperator}{.}\textcolor{vscDefault}{scatter}\textcolor{vscBracket}{(}\textcolor{vscDefault}{X}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{y}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{alpha}\textcolor{vscOperator}{=}\textcolor{vscNumber}{0.5}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{label}\textcolor{vscOperator}{=}\textcolor{vscString}{"Data"}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{color}\textcolor{vscOperator}{=}\textcolor{vscString}{"steelblue"}\textcolor{vscBracket}{)}
+\textcolor{vscDefault}{    }\textcolor{vscDefault}{x\_line}\textcolor{vscDefault}{ }\textcolor{vscOperator}{=}\textcolor{vscDefault}{ }\textcolor{vscDefault}{np}\textcolor{vscOperator}{.}\textcolor{vscDefault}{linspace}\textcolor{vscBracket}{(}\textcolor{vscDefault}{X}\textcolor{vscOperator}{.}\textcolor{vscDefault}{min}\textcolor{vscBracket}{(}\textcolor{vscBracket}{)}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{X}\textcolor{vscOperator}{.}\textcolor{vscDefault}{max}\textcolor{vscBracket}{(}\textcolor{vscBracket}{)}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscNumber}{200}\textcolor{vscBracket}{)}\textcolor{vscOperator}{.}\textcolor{vscDefault}{reshape}\textcolor{vscBracket}{(}\textcolor{vscOperator}{-}\textcolor{vscNumber}{1}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscNumber}{1}\textcolor{vscBracket}{)}
+\textcolor{vscDefault}{    }\textcolor{vscDefault}{ax}\textcolor{vscOperator}{.}\textcolor{vscDefault}{plot}\textcolor{vscBracket}{(}\textcolor{vscDefault}{x\_line}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{results}\textcolor{vscBracket}{[}\textcolor{vscString}{"model"}\textcolor{vscBracket}{]}\textcolor{vscOperator}{.}\textcolor{vscDefault}{predict}\textcolor{vscBracket}{(}\textcolor{vscDefault}{x\_line}\textcolor{vscBracket}{)}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{color}\textcolor{vscOperator}{=}\textcolor{vscString}{"crimson"}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{lw}\textcolor{vscOperator}{=}\textcolor{vscNumber}{2}\textcolor{vscOperator}{,}
+\textcolor{vscDefault}{            }\textcolor{vscDefault}{label}\textcolor{vscOperator}{=}\textcolor{vscDefault}{f"}\textcolor{vscDefault}{Fit: y = }\textcolor{vscBracket}{\{}\textcolor{vscDefault}{results}\textcolor{vscBracket}{[}\textcolor{vscString}{'coef'}\textcolor{vscBracket}{]}\textcolor{vscOperator}{:}\textcolor{vscDefault}{.2f}\textcolor{vscBracket}{\}}\textcolor{vscDefault}{x + }\textcolor{vscBracket}{\{}\textcolor{vscDefault}{results}\textcolor{vscBracket}{[}\textcolor{vscString}{'intercept'}\textcolor{vscBracket}{]}\textcolor{vscOperator}{:}\textcolor{vscDefault}{.2f}\textcolor{vscBracket}{\}}\textcolor{vscDefault}{"}\textcolor{vscBracket}{)}
+\textcolor{vscDefault}{    }\textcolor{vscDefault}{ax}\textcolor{vscOperator}{.}\textcolor{vscDefault}{set\_xlabel}\textcolor{vscBracket}{(}\textcolor{vscString}{"X"}\textcolor{vscBracket}{)}
+\textcolor{vscDefault}{    }\textcolor{vscDefault}{ax}\textcolor{vscOperator}{.}\textcolor{vscDefault}{set\_ylabel}\textcolor{vscBracket}{(}\textcolor{vscString}{"y"}\textcolor{vscBracket}{)}
+\textcolor{vscDefault}{    }\textcolor{vscDefault}{ax}\textcolor{vscOperator}{.}\textcolor{vscDefault}{set\_title}\textcolor{vscBracket}{(}\textcolor{vscString}{"Linear Regression Fit"}\textcolor{vscBracket}{)}
+\textcolor{vscDefault}{    }\textcolor{vscDefault}{ax}\textcolor{vscOperator}{.}\textcolor{vscDefault}{legend}\textcolor{vscBracket}{(}\textcolor{vscBracket}{)}
+\mbox{}
+\textcolor{vscDefault}{    }\textcolor{vscComment}{\# Residuals plot}
+\textcolor{vscDefault}{    }\textcolor{vscDefault}{ax}\textcolor{vscDefault}{ }\textcolor{vscOperator}{=}\textcolor{vscDefault}{ }\textcolor{vscDefault}{axes}\textcolor{vscBracket}{[}\textcolor{vscNumber}{1}\textcolor{vscBracket}{]}
+\textcolor{vscDefault}{    }\textcolor{vscDefault}{residuals}\textcolor{vscDefault}{ }\textcolor{vscOperator}{=}\textcolor{vscDefault}{ }\textcolor{vscDefault}{results}\textcolor{vscBracket}{[}\textcolor{vscString}{"y\_test"}\textcolor{vscBracket}{]}\textcolor{vscDefault}{ }\textcolor{vscOperator}{-}\textcolor{vscDefault}{ }\textcolor{vscDefault}{results}\textcolor{vscBracket}{[}\textcolor{vscString}{"y\_pred"}\textcolor{vscBracket}{]}
+\textcolor{vscDefault}{    }\textcolor{vscDefault}{ax}\textcolor{vscOperator}{.}\textcolor{vscDefault}{scatter}\textcolor{vscBracket}{(}\textcolor{vscDefault}{results}\textcolor{vscBracket}{[}\textcolor{vscString}{"y\_pred"}\textcolor{vscBracket}{]}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{residuals}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{alpha}\textcolor{vscOperator}{=}\textcolor{vscNumber}{0.6}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{color}\textcolor{vscOperator}{=}\textcolor{vscString}{"darkorange"}\textcolor{vscBracket}{)}
+\textcolor{vscDefault}{    }\textcolor{vscDefault}{ax}\textcolor{vscOperator}{.}\textcolor{vscDefault}{axhline}\textcolor{vscBracket}{(}\textcolor{vscNumber}{0}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{color}\textcolor{vscOperator}{=}\textcolor{vscString}{"black"}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{lw}\textcolor{vscOperator}{=}\textcolor{vscNumber}{1}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{linestyle}\textcolor{vscOperator}{=}\textcolor{vscString}{"--"}\textcolor{vscBracket}{)}
+\textcolor{vscDefault}{    }\textcolor{vscDefault}{ax}\textcolor{vscOperator}{.}\textcolor{vscDefault}{set\_xlabel}\textcolor{vscBracket}{(}\textcolor{vscString}{"Predicted"}\textcolor{vscBracket}{)}
+\textcolor{vscDefault}{    }\textcolor{vscDefault}{ax}\textcolor{vscOperator}{.}\textcolor{vscDefault}{set\_ylabel}\textcolor{vscBracket}{(}\textcolor{vscString}{"Residuals"}\textcolor{vscBracket}{)}
+\textcolor{vscDefault}{    }\textcolor{vscDefault}{ax}\textcolor{vscOperator}{.}\textcolor{vscDefault}{set\_title}\textcolor{vscBracket}{(}\textcolor{vscDefault}{f"}\textcolor{vscDefault}{Residuals  (RMSE=}\textcolor{vscBracket}{\{}\textcolor{vscDefault}{results}\textcolor{vscBracket}{[}\textcolor{vscString}{'rmse'}\textcolor{vscBracket}{]}\textcolor{vscOperator}{:}\textcolor{vscDefault}{.2f}\textcolor{vscBracket}{\}}\textcolor{vscDefault}{, R²=}\textcolor{vscBracket}{\{}\textcolor{vscDefault}{results}\textcolor{vscBracket}{[}\textcolor{vscString}{'r2'}\textcolor{vscBracket}{]}\textcolor{vscOperator}{:}\textcolor{vscDefault}{.3f}\textcolor{vscBracket}{\}}\textcolor{vscDefault}{)}\textcolor{vscDefault}{"}\textcolor{vscBracket}{)}
+\mbox{}
+\textcolor{vscDefault}{    }\textcolor{vscDefault}{plt}\textcolor{vscOperator}{.}\textcolor{vscDefault}{tight\_layout}\textcolor{vscBracket}{(}\textcolor{vscBracket}{)}
+\textcolor{vscDefault}{    }\textcolor{vscDefault}{plt}\textcolor{vscOperator}{.}\textcolor{vscDefault}{savefig}\textcolor{vscBracket}{(}\textcolor{vscString}{"images/linear\_regression\_results.png"}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{dpi}\textcolor{vscOperator}{=}\textcolor{vscNumber}{150}\textcolor{vscBracket}{)}
+\textcolor{vscDefault}{    }\textcolor{vscDefault}{plt}\textcolor{vscOperator}{.}\textcolor{vscDefault}{show}\textcolor{vscBracket}{(}\textcolor{vscBracket}{)}
+\mbox{}
+\mbox{}
+\textcolor{vscKeyword}{if}\textcolor{vscDefault}{ }\textcolor{vscDefault}{\_\_name\_\_}\textcolor{vscDefault}{ }\textcolor{vscOperator}{==}\textcolor{vscDefault}{ }\textcolor{vscString}{"\_\_main\_\_"}\textcolor{vscOperator}{:}
+\textcolor{vscDefault}{    }\textcolor{vscDefault}{X}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{y}\textcolor{vscDefault}{ }\textcolor{vscOperator}{=}\textcolor{vscDefault}{ }\textcolor{vscDefault}{generate\_data}\textcolor{vscBracket}{(}\textcolor{vscDefault}{n}\textcolor{vscOperator}{=}\textcolor{vscNumber}{200}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{noise}\textcolor{vscOperator}{=}\textcolor{vscNumber}{12.0}\textcolor{vscBracket}{)}
+\textcolor{vscDefault}{    }\textcolor{vscDefault}{results}\textcolor{vscDefault}{ }\textcolor{vscOperator}{=}\textcolor{vscDefault}{ }\textcolor{vscDefault}{fit\_and\_evaluate}\textcolor{vscBracket}{(}\textcolor{vscDefault}{X}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{y}\textcolor{vscBracket}{)}
+\mbox{}
+\textcolor{vscDefault}{    }\textcolor{vscDefault}{print}\textcolor{vscBracket}{(}\textcolor{vscDefault}{f"}\textcolor{vscDefault}{Coefficient : }\textcolor{vscBracket}{\{}\textcolor{vscDefault}{results}\textcolor{vscBracket}{[}\textcolor{vscString}{'coef'}\textcolor{vscBracket}{]}\textcolor{vscOperator}{:}\textcolor{vscDefault}{.4f}\textcolor{vscBracket}{\}}\textcolor{vscDefault}{"}\textcolor{vscBracket}{)}
+\textcolor{vscDefault}{    }\textcolor{vscDefault}{print}\textcolor{vscBracket}{(}\textcolor{vscDefault}{f"}\textcolor{vscDefault}{Intercept   : }\textcolor{vscBracket}{\{}\textcolor{vscDefault}{results}\textcolor{vscBracket}{[}\textcolor{vscString}{'intercept'}\textcolor{vscBracket}{]}\textcolor{vscOperator}{:}\textcolor{vscDefault}{.4f}\textcolor{vscBracket}{\}}\textcolor{vscDefault}{"}\textcolor{vscBracket}{)}
+\textcolor{vscDefault}{    }\textcolor{vscDefault}{print}\textcolor{vscBracket}{(}\textcolor{vscDefault}{f"}\textcolor{vscDefault}{RMSE        : }\textcolor{vscBracket}{\{}\textcolor{vscDefault}{results}\textcolor{vscBracket}{[}\textcolor{vscString}{'rmse'}\textcolor{vscBracket}{]}\textcolor{vscOperator}{:}\textcolor{vscDefault}{.4f}\textcolor{vscBracket}{\}}\textcolor{vscDefault}{"}\textcolor{vscBracket}{)}
+\textcolor{vscDefault}{    }\textcolor{vscDefault}{print}\textcolor{vscBracket}{(}\textcolor{vscDefault}{f"}\textcolor{vscDefault}{R²          : }\textcolor{vscBracket}{\{}\textcolor{vscDefault}{results}\textcolor{vscBracket}{[}\textcolor{vscString}{'r2'}\textcolor{vscBracket}{]}\textcolor{vscOperator}{:}\textcolor{vscDefault}{.4f}\textcolor{vscBracket}{\}}\textcolor{vscDefault}{"}\textcolor{vscBracket}{)}
+\mbox{}
+\textcolor{vscDefault}{    }\textcolor{vscDefault}{plot\_results}\textcolor{vscBracket}{(}\textcolor{vscDefault}{results}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{X}\textcolor{vscOperator}{,}\textcolor{vscDefault}{ }\textcolor{vscDefault}{y}\textcolor{vscBracket}{)}%
+}%
+      \end{alltt}%
     \end{minipage}
 
   \end{tcolorbox}
