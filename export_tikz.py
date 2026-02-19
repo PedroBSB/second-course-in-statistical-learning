@@ -423,6 +423,8 @@ def build_snippet(source_path: Path, *, use_pdflatex: bool = False) -> str:
   boxrule=12pt,
   colframe=vscFrameOuter,
   colback=vscBackground,
+  interior style={{fill=vscBackground}},
+  frame style={{fill=vscFrameOuter}},
   colupper=vscDefault,
   left=4pt, right=4pt, top=8pt, bottom=8pt,
 ]
