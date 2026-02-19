@@ -1,0 +1,38 @@
+# Makefile.win - Windows equivalent using nmake or run via: make -f Makefile.win
+# Usage: Run these commands in Command Prompt or PowerShell with make installed,
+#        or execute the commands manually as shown in each target.
+
+PYTHON = python
+POETRY = poetry
+VENV_DIR = .venv
+
+.PHONY: setup shell clean help
+
+## setup: Create virtual environment and install all dependencies
+setup:
+	$(POETRY) config virtualenvs.in-project true
+	$(POETRY) env use $(PYTHON)
+	$(POETRY) install
+	@echo.
+	@echo Setup complete. Virtual environment created at $(VENV_DIR)\
+	@echo Run "make -f Makefile.win shell" to activate the virtual environment.
+
+## shell: Activate the virtual environment
+shell:
+	@echo Starting a shell with the virtual environment activated...
+	$(POETRY) shell
+
+## clean: Remove the virtual environment and cached files
+clean:
+	if exist $(VENV_DIR) rmdir /s /q $(VENV_DIR)
+	for /r . %%d in (__pycache__) do if exist "%%d" rmdir /s /q "%%d"
+	del /s /q *.pyc 2>nul
+	@echo Cleaned virtual environment and cached files.
+
+## help: Show available targets
+help:
+	@echo Available targets:
+	@echo   setup  - Create virtual environment and install all dependencies
+	@echo   shell  - Activate the virtual environment
+	@echo   clean  - Remove the virtual environment and cached files
+	@echo   help   - Show this help message
