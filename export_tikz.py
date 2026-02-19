@@ -31,12 +31,12 @@ from pathlib import Path
 # VSCode Dark token colors (extracted from live CodeImage CSS via Playwright)
 # ---------------------------------------------------------------------------
 COLORS: dict[str, str] = {
-    # Background colors — verified from live CodeImage DOM (Playwright)
-    "background":  "#1D1D1D",  # editor background   (_1ipb3lb0, rgb(29,29,29))
+    # Background colors — code block background changed to RGB(0,29,74)
+    "background":  "#001D4A",  # editor background   RGB(0,29,74)
     "frame_outer": "#151516",  # outer window frame  (_5i4ydv4, rgb(21,21,22))
-    # CodeImage outer gradient: linear-gradient(to right bottom, #1cb1f2 → #0059ff)
-    "grad_start":  "#1CB1F2",  # gradient top-left
-    "grad_end":    "#0059FF",  # gradient bottom-right
+    # Gradient colors: linear-gradient(to right bottom, lightest → darkest)
+    "grad_start":  "#1CB1F2",  # gradient top-left (lightest)
+    "grad_end":    "#0059FF",  # gradient bottom-right (darkest)
     # Syntax token colors — verified from .cm-line span computed styles
     "default":     "#9AD6FE",  # default text / unspanned (cm-line, rgb(154,214,254))
     "keyword":     "#529DDA",  # def, return, import… (ͼp6, rgb(82,157,218))
@@ -271,6 +271,7 @@ def _preamble_comment(use_pdflatex: bool) -> str:
 %% \\usepackage[most]{{tcolorbox}}
 %% \\tcbuselibrary{{skins,breakable}}
 %%
+%%
 %% NOTE: No \\tcbset{{codewindow}} needed — all tcolorbox options are
 %% embedded directly in each \\begin{{tcolorbox}}[...] block.
 %% Remove any old codewindow/codepanel \\tcbset entries from preamble.
@@ -379,7 +380,14 @@ def _render_line_wrapped(
 # ---------------------------------------------------------------------------
 # Main snippet builder
 # ---------------------------------------------------------------------------
-def build_snippet(source_path: Path, *, use_pdflatex: bool = False) -> str:
+def build_snippet(
+    source_path: Path,
+    *,
+    use_pdflatex: bool = False,
+    code_number: str = "XX",
+    horizontal_spacing: int = 18,
+    vertical_spacing: int = 15
+) -> str:
     """Return a LaTeX snippet (tcolorbox block only, no preamble/document).
 
     Each source line is rendered as an inline paragraph:
@@ -388,6 +396,13 @@ def build_snippet(source_path: Path, *, use_pdflatex: bool = False) -> str:
     No minipage, no alltt — spaces are preserved via explicit \\ (backslash-space)
     inserted by _latex_escape for every space character.
     Long lines are wrapped at _WRAP_WIDTH visible chars with a continuation marker.
+
+    Args:
+        source_path: Path to the Python source file
+        use_pdflatex: Whether to use pdfLaTeX-compatible fonts
+        code_number: The code listing number for the caption (default: "XX")
+        horizontal_spacing: Horizontal spacing (xshift) between layers in pt (default: 18)
+        vertical_spacing: Vertical spacing (yshift) between layers in pt (default: 15)
     """
     source = source_path.read_text(encoding="utf-8")
     lines  = source.splitlines()
@@ -426,6 +441,10 @@ def build_snippet(source_path: Path, *, use_pdflatex: bool = False) -> str:
 
     code_body = "\n".join(body_lines)
     filename = _latex_escape(source_path.name)
+    # Create label from filename (e.g., "linear_regression.py" -> "linear_regression")
+    label_name = source_path.stem.replace("_", "-")
+    # Create caption text (e.g., "linear_regression.py" -> "Linear Regression")
+    caption_text = source_path.stem.replace("_", " ").title()
     preamble_hint = _preamble_comment(use_pdflatex)
 
     return f"""{preamble_hint}
@@ -449,9 +468,9 @@ def build_snippet(source_path: Path, *, use_pdflatex: bool = False) -> str:
            rounded corners=12pt]
       (frame.south west) rectangle (frame.north east);
     \\fill[vscBackground, rounded corners=8pt]
-      ([xshift=10pt,yshift=10pt]frame.south west)
+      ([xshift={horizontal_spacing}pt,yshift={vertical_spacing}pt]frame.south west)
       rectangle
-      ([xshift=-10pt,yshift=-10pt]frame.north east);
+      ([xshift=-{horizontal_spacing}pt,yshift=-{vertical_spacing}pt]frame.north east);
   }},
 ]
 
@@ -475,6 +494,10 @@ def build_snippet(source_path: Path, *, use_pdflatex: bool = False) -> str:
 {code_body}
 
 \\end{{tcolorbox}}
+\\label{{code:{label_name}}}
+\\begin{{center}}
+\\textbf{{Code {code_number}:}} {caption_text}
+\\end{{center}}
 """
 
 
