@@ -4,11 +4,12 @@ VENV_DIR = .venv
 
 .PHONY: setup shell clean help
 
-## setup: Create virtual environment and install all dependencies
+## setup: Create virtual environment, install all dependencies and Playwright browser
 setup:
 	$(POETRY) config virtualenvs.in-project true
 	$(POETRY) env use $(PYTHON)
 	$(POETRY) install
+	$(POETRY) run playwright install chromium
 	@echo ""
 	@echo "Setup complete. Virtual environment created at $(VENV_DIR)/"
 	@echo "Run 'make shell' to activate the virtual environment."
