@@ -252,7 +252,8 @@ def _preamble_comment(use_pdflatex: bool) -> str:
 %% % ---- tcolorbox styles (paste once, before first use) ------
 %% \\tcbset{{
 %%   codewindow/.style={{
-%%     enhanced, arc=10pt, outer arc=10pt, boxrule=0pt,
+%%     enhanced, breakable,
+%%     arc=10pt, outer arc=10pt, boxrule=0pt,
 %%     colback=vscFrameOuter, colframe=vscFrameOuter,
 %%     left=20pt, right=20pt, top=10pt, bottom=18pt,
 %%   }},
@@ -269,6 +270,105 @@ def _preamble_comment(use_pdflatex: bool) -> str:
 
 
 # ---------------------------------------------------------------------------
+# Line wrapping
+# ---------------------------------------------------------------------------
+# Maximum visible characters per line before wrapping.
+# At \tiny in a 4.5in text block minus ~2em line-number column ≈ 62 chars.
+_WRAP_WIDTH = 62
+# Indent added to continuation lines (matches common Python indent feel).
+_CONT_INDENT = "    "
+# Continuation marker colour (dim, like a line-continuation glyph).
+_CONT_MARKER = f"\\textcolor{{vscLineno}}{{\\textbackslash{{}}}}"
+
+
+def _visible_len(rendered: str) -> int:
+    """Return the number of visible characters in a rendered LaTeX line.
+
+    Strips all \\textcolor{name}{...} wrappers and other LaTeX commands,
+    counting only the content characters.
+    """
+    import re
+    # Remove \textcolor{name}{ ... } — handle up to 4 levels of nesting
+    s = rendered
+    for _ in range(6):
+        s = re.sub(r"\\textcolor\{[^{}]+\}\{([^{}]*)\}", r"\1", s)
+    # Remove remaining simple commands like \mbox{}, \textbackslash{}, etc.
+    s = re.sub(r"\\[a-zA-Z]+\{[^{}]*\}", "", s)
+    s = re.sub(r"\\[a-zA-Z]+", "", s)
+    s = re.sub(r"[{}]", "", s)
+    return len(s)
+
+
+def _split_segments_at(
+    segments: list[tuple[str, TokenKind]],
+    max_chars: int,
+) -> tuple[list[tuple[str, TokenKind]], list[tuple[str, TokenKind]]]:
+    """Split segment list so the first part has at most *max_chars* visible chars.
+
+    Splits at a token boundary (never mid-token).
+    Returns (first_part, rest).
+    """
+    acc = 0
+    for i, (text, kind) in enumerate(segments):
+        if acc + len(text) > max_chars:
+            # Split this token's text at a space if possible
+            for j in range(len(text) - 1, 0, -1):
+                if text[j] in " ,(" and acc + j <= max_chars:
+                    before = text[: j + 1]
+                    after  = text[j + 1 :]
+                    first  = segments[:i] + [(before, kind)]
+                    rest   = [(after, kind)] + segments[i + 1 :]
+                    return first, rest
+            # No space found — split at token boundary
+            return segments[:i], segments[i:]
+        acc += len(text)
+    return segments, []
+
+
+def _render_line_wrapped(
+    line_text: str,
+    line_no: int,
+    spans: list[tuple[int, int, int, int, TokenKind]],
+    wrap_width: int = _WRAP_WIDTH,
+    cont_indent: str = _CONT_INDENT,
+) -> tuple[str, int]:
+    """Render one source line, wrapping if longer than *wrap_width*.
+
+    Returns (latex_string, number_of_physical_lines_produced).
+    Continuation lines are indented and prefixed with a dim backslash marker.
+    """
+    segments = _colourise_line(line_text.rstrip("\n"), line_no, spans)
+    physical_lines: list[str] = []
+
+    first_pass = True
+    while segments:
+        first, segments = _split_segments_at(segments, wrap_width)
+        parts = []
+        for text, kind in first:
+            if not text:
+                continue
+            parts.append(
+                f"\\textcolor{{{_color_name(kind)}}}{{{_latex_escape(text)}}}"
+            )
+        rendered = "".join(parts)
+        if not first_pass:
+            # Continuation line: dim backslash + indent
+            indent_escaped = _latex_escape(cont_indent)
+            rendered = (
+                f"{_CONT_MARKER}"
+                f"\\textcolor{{vscDefault}}{{{indent_escaped}}}"
+                + rendered
+            )
+        physical_lines.append(rendered)
+        first_pass = False
+
+    if not physical_lines:
+        return "", 1
+
+    return "\n".join(physical_lines), len(physical_lines)
+
+
+# ---------------------------------------------------------------------------
 # Main snippet builder
 # ---------------------------------------------------------------------------
 def build_snippet(source_path: Path, *, use_pdflatex: bool = False) -> str:
@@ -277,35 +377,35 @@ def build_snippet(source_path: Path, *, use_pdflatex: bool = False) -> str:
     Uses alltt for the code body so that:
     - spaces are preserved verbatim (indentation works)
     - line breaks are natural (no \\ needed, no "no line to end" errors)
-    - \textcolor{}{} commands still work inside alltt
+    - \\textcolor{}{} commands still work inside alltt
+    Long lines are wrapped at _WRAP_WIDTH visible chars with a continuation marker.
     """
     source = source_path.read_text(encoding="utf-8")
     lines  = source.splitlines()
-    n_lines = len(lines)
 
     raw_spans = tokenize_python(source)
     spans     = _annotate_function_names(lines, raw_spans)
 
-    # Inside alltt, only \, {, } are special.  Spaces and newlines are literal.
-    # We already escape those three in _latex_escape, so _render_line is safe.
-    # We just need to NOT use \\ for line breaks — alltt uses real newlines.
-    code_lines = [
-        _render_line(line, i, spans)
-        for i, line in enumerate(lines, start=1)
-    ]
-    # alltt treats a blank line as a paragraph break (adds extra vertical space).
-    # Replace empty rendered lines with a \mbox{} to suppress that.
-    code_alltt = "\n".join(
-        (line if line.strip() else "\\mbox{}")
-        for line in code_lines
-    )
+    # Render each source line, wrapping long ones.
+    # Track how many physical lines each source line produces
+    # so we can emit the correct number of line-number entries.
+    rendered_code_parts: list[str] = []
+    lineno_entries: list[str] = []
 
-    # Line-number column: one number per line, right-aligned, same font size.
-    # Use a simple tabular with a fixed-width column.
-    lineno_lines = "\n".join(
-        f"    \\textcolor{{vscLineno}}{{{i}}} \\\\"
-        for i in range(1, n_lines + 1)
-    )
+    for i, line in enumerate(lines, start=1):
+        if not line.strip():
+            rendered_code_parts.append("\\mbox{}")
+            lineno_entries.append(f"    \\textcolor{{vscLineno}}{{{i}}} \\\\")
+        else:
+            rendered, n_physical = _render_line_wrapped(line, i, spans)
+            rendered_code_parts.append(rendered)
+            # First physical line gets the line number; continuations are blank
+            lineno_entries.append(f"    \\textcolor{{vscLineno}}{{{i}}} \\\\")
+            for _ in range(n_physical - 1):
+                lineno_entries.append("    \\textcolor{vscLineno}{~} \\\\")
+
+    code_alltt = "\n".join(rendered_code_parts)
+    lineno_lines = "\n".join(lineno_entries)
 
     filename = _latex_escape(source_path.name)
     preamble_hint = _preamble_comment(use_pdflatex)
