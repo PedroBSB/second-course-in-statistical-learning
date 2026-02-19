@@ -341,10 +341,8 @@ def build_snippet(source_path: Path, *, use_pdflatex: bool = False) -> str:
     \\end{{minipage}}%
     \\hspace{{4pt}}%
     \\begin{{minipage}}[t]{{\\dimexpr\\linewidth-2.0em-4pt\\relax}}%
-      \\begin{{alltt}}%
-\\tiny\\ttfamily\\color{{vscDefault}}%
-{code_alltt}%
-      \\end{{alltt}}%
+      {{\\tiny\\ttfamily\\color{{vscDefault}}%
+      \\begin{{alltt}}{code_alltt}\\end{{alltt}}}}%
     \\end{{minipage}}
 
   \\end{{tcolorbox}}
