@@ -188,7 +188,7 @@ def _latex_escape(text: str) -> str:
     # \tiny JetBrains Mono Scale=0.85. Using \hspace avoids the XeLaTeX
     # argument-scanner ambiguity that '\ ' (control space) can cause when
     # it appears just before a \textcolor{} color-name argument.
-    text = text.replace(" ",  r"\hspace{.6em}")
+    text = text.replace(" ",  r"\kern\fontdimen2\font")
     return text
 
 
