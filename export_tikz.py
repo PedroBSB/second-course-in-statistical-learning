@@ -174,27 +174,34 @@ def _latex_escape(text: str) -> str:
     Single/double quotes are replaced with \\textquotesingle{} / \\textquotedbl{}
     to prevent fontspec ligature substitution in \\ttfamily mode.
     """
-    text = text.replace("\\", r"\textbackslash{}")
+    # Use placeholders for open/close braces so that braces introduced by
+    # earlier replacements (e.g. \textbackslash{}) are not re-escaped.
+    _OB = "\x00OB\x00"  # placeholder for {
+    _CB = "\x00CB\x00"  # placeholder for }
+    text = text.replace("\\", f"\\textbackslash{_OB}{_CB}")
     text = text.replace("{",  r"\{")
     text = text.replace("}",  r"\}")
     text = text.replace("$",  r"\$")
     text = text.replace("&",  r"\&")
     text = text.replace("#",  r"\#")
-    text = text.replace("^",  r"\^{}")
+    text = text.replace("^",  f"\\^{_OB}{_CB}")
     text = text.replace("_",  r"\_")
-    text = text.replace("~",  r"\textasciitilde{}")
+    text = text.replace("~",  f"\\textasciitilde{_OB}{_CB}")
     text = text.replace("%",  r"\%")
-    text = text.replace("<",  r"\textless{}")
-    text = text.replace(">",  r"\textgreater{}")
-    text = text.replace("|",  r"\textbar{}")
-    text = text.replace("'",  r"\textquotesingle{}")
-    text = text.replace('"',  r"\textquotedbl{}")
+    text = text.replace("<",  f"\\textless{_OB}{_CB}")
+    text = text.replace(">",  f"\\textgreater{_OB}{_CB}")
+    text = text.replace("|",  f"\\textbar{_OB}{_CB}")
+    text = text.replace("'",  f"\\textquotesingle{_OB}{_CB}")
+    text = text.replace('"',  f"\\textquotedbl{_OB}{_CB}")
     # Replace every space with a kern equal to one em-unit of the current
     # font. \hspace{.6em} approximates the monospace character width at
     # \tiny JetBrains Mono Scale=0.85. Using \hspace avoids the XeLaTeX
     # argument-scanner ambiguity that '\ ' (control space) can cause when
     # it appears just before a \textcolor{} color-name argument.
-    text = text.replace(" ",  r"\kern\fontdimen2\font")
+    text = text.replace(" ",  f"\\kern\\fontdimen2\\font{_OB}{_CB}")
+    # Resolve placeholders to real braces
+    text = text.replace(_OB, "{")
+    text = text.replace(_CB, "}")
     return text
 
 
