@@ -11,6 +11,12 @@ warnings.filterwarnings(
 )
 
 from source.config_hybrid_spline import *
+from source.partial_effects_hybrid_spline import (
+    get_linear_partial_effects,
+    get_spline_partial_effects,
+    plot_partial_effects,
+    print_partial_effects,
+)
 from source.plots_hybrid_spline import plot_final_fit, plot_lambda_risk
 from source.preprocessing_hybrid_spline import prepare_train_test_designs
 from source.training_hybrid_spline import fit_hybrid_pspline, predict_hybrid_pspline
@@ -73,3 +79,14 @@ predictions_df['residual'] = predictions_df['accel'] - predictions_df['pred_acce
 predictions_df.to_csv(PREDICTIONS_PATH, index=False)
 
 plot_final_fit(df_all=df, preprocessor=final_preprocessor, model=final_model)
+
+# ── Partial effects ──────────────────────────────────────────
+linear_effects = get_linear_partial_effects(model=final_model, preprocessor=final_preprocessor)
+spline_effects = get_spline_partial_effects(
+    model=final_model,
+    preprocessor=final_preprocessor,
+    times_range=(df['times'].min(), df['times'].max()),
+)
+
+print_partial_effects(linear_effects, spline_effects)
+plot_partial_effects(linear_effects, spline_effects)
