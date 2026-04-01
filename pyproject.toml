@@ -21,6 +21,7 @@ playwright = "^1.50"
 pyro-ppl = {version = ">=1.9.1", python = ">=3.13,<3.15"}
 torch = {version = ">=2.10.0", python = ">=3.13,<3.15"}
 pandas-stubs = "~=2.3.3"
+scikit-image = "^0.26.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3"
